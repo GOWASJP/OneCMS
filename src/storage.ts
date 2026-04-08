@@ -3,7 +3,7 @@
  * localStorageにはハンドルを保存できないためIndexedDBを使用
  */
 
-const DB_NAME = 'gowas-cms'
+const DB_NAME = 'one-cms'
 const STORE_NAME = 'handles'
 const KEY = 'rootFolder'
 

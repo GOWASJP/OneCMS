@@ -140,7 +140,7 @@ interface CmsComponent {
 Alpine.data('cms', () => {
   const component: CmsComponent & ThisType<CmsComponent> = {
     // 状態管理
-    authorName: localStorage.getItem('gowas-cms-author') || '',
+    authorName: localStorage.getItem('one-cms-author') || '',
     authorInput: '',
     folderHandle: null,
     view: 'welcome',
@@ -279,14 +279,14 @@ Alpine.data('cms', () => {
       if (this.view === 'content-list' && this.currentType) return this.currentType.label
       if (this.view === 'settings') return 'サイト設定'
       if (this.view === 'export-result') return '公開準備 完了'
-      return 'GOWAS CMS'
+      return 'ONE CMS'
     },
 
     setAuthor() {
       const name = this.authorInput.trim()
       if (!name) return
       this.authorName = name
-      localStorage.setItem('gowas-cms-author', name)
+      localStorage.setItem('one-cms-author', name)
     },
 
     showToast(message: string, duration = 3000) {
