@@ -78,7 +78,7 @@
                   <span>ページ追加</span>
                 </button>
 
-                <div class="gh-nav-section">コンテンツ</div>
+                <div class="gh-nav-section">投稿タイプ</div>
                 <template x-for="type in contentTypes" :key="type.id">
                   <button
                     @click="openContentType(type)"
@@ -209,6 +209,9 @@
                     履歴
                   </button>
                   <div class="flex-1"></div>
+                  <button @click="deletePage()" class="text-[#dc2626] text-xs hover:underline">
+                    削除
+                  </button>
                   <button @click="savePage()" class="gh-btn-green text-[13px]">更新</button>
                 </div>
 
@@ -274,10 +277,7 @@
                       <i data-lucide="settings" class="w-3 h-3"></i>
                       設定
                     </button>
-                    <button
-                      @click="if(confirm(currentType?.label + ' を削除しますか？')) deleteType()"
-                      class="text-[#dc2626] text-xs hover:underline"
-                    >
+                    <button @click="deleteType()" class="text-[#dc2626] text-xs hover:underline">
                       削除
                     </button>
                   </div>
@@ -333,6 +333,9 @@
                     <option value="published">公開中</option>
                     <option value="archived">アーカイブ</option>
                   </select>
+                  <button @click="deleteContent()" class="text-[#dc2626] text-xs hover:underline">
+                    削除
+                  </button>
                   <button @click="savePage()" class="gh-btn-green text-[13px]">更新</button>
                 </div>
 

@@ -100,6 +100,8 @@ interface CmsComponent {
   showRevisions(): Promise<void>
   selectRevision(rev: RevisionEntry): Promise<void>
   restoreRevision(): Promise<void>
+  deleteContent(): Promise<void>
+  deletePage(): Promise<void>
   showPreview(): Promise<void>
   closePanel(): void
   exportSite(): Promise<void>
@@ -624,6 +626,48 @@ Alpine.data('cms', () => {
       this.showToast('サイト設定を保存しました')
     },
 
+    // --- 削除 ---
+
+    async deleteContent() {
+      if (!this.fs || !this.currentType || !this.currentPage) return
+      const title = this.currentPage.title || this.currentPage.id
+      if (!window.confirm(`「${title}」を削除しますか？`)) return
+      const dir = await this.fs.getDir(`content/${this.currentType.id}/${this.currentPage.id}`)
+      if (dir) {
+        // ディレクトリ内の全ファイルを削除
+        const parentDir = await this.fs.getDir(`content/${this.currentType.id}`)
+        if (parentDir) {
+          try {
+            await parentDir.removeEntry(this.currentPage.id, { recursive: true })
+          } catch {
+            /* skip */
+          }
+        }
+      }
+      this.contentItems = await this.fs.readContentList(this.currentType.id, this.currentLang)
+      this.currentPage = null
+      this.view = 'content-list'
+      this.showToast('削除しました')
+    },
+
+    async deletePage() {
+      if (!this.fs || !this.currentPage) return
+      const title = this.currentPage.title || this.currentPage.id
+      if (!window.confirm(`「${title}」を削除しますか？`)) return
+      const parentDir = await this.fs.getDir('content/pages')
+      if (parentDir) {
+        try {
+          await parentDir.removeEntry(this.currentPage.id, { recursive: true })
+        } catch {
+          /* skip */
+        }
+      }
+      this.pages = await this.fs.readPages(this.currentLang)
+      this.currentPage = null
+      this.view = 'welcome'
+      this.showToast('削除しました')
+    },
+
     // --- リビジョン管理 ---
 
     async showRevisions() {
@@ -903,7 +947,9 @@ Alpine.data('cms', () => {
 
     async deleteType() {
       const typeId = this.editingType?.id || this.currentType?.id
+      const typeLabel = this.editingType?.label || this.currentType?.label || ''
       if (!this.fs || !typeId) return
+      if (!window.confirm(`「${typeLabel}」を削除しますか？`)) return
       const dir = await this.fs.getDir('content/_types')
       if (dir) {
         try {
