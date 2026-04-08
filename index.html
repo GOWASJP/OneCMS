@@ -896,7 +896,10 @@
                           ドラッグで並び替え。項目をクリックして展開・編集。
                         </p>
 
-                        <div class="space-y-1.5 mb-6 min-h-[120px]" x-data="{ dragIdx: null }">
+                        <div
+                          class="space-y-1.5 mb-6 min-h-[120px]"
+                          x-data="{ dragIdx: null, openIdx: -1 }"
+                        >
                           <template x-for="(item, idx) in currentMenu.items" :key="item.id">
                             <div
                               class="border border-[#ebeef0] rounded-md bg-white transition-opacity"
@@ -916,7 +919,7 @@
                                 ></i>
                                 <span
                                   class="flex-1 font-medium truncate cursor-pointer"
-                                  @click="item._open = !item._open"
+                                  @click="openIdx = openIdx === idx ? -1 : idx"
                                   x-text="item.label || '（無題）'"
                                 ></span>
                                 <span
@@ -924,19 +927,19 @@
                                   x-text="item.type === 'custom' ? 'カスタムリンク' : item.type === 'page' ? '固定ページ' : item.type === 'post_type' ? '投稿タイプ' : 'カテゴリ'"
                                 ></span>
                                 <button
-                                  @click="item._open = !item._open"
+                                  @click="openIdx = openIdx === idx ? -1 : idx"
                                   class="p-1 text-[#7c8b9a] hover:text-[#15171a] hover:bg-[#f1f3f5] rounded shrink-0"
                                 >
                                   <i
                                     data-lucide="chevron-down"
                                     class="w-3.5 h-3.5 transition-transform"
-                                    :class="item._open && 'rotate-180'"
+                                    :class="openIdx === idx && 'rotate-180'"
                                   ></i>
                                 </button>
                               </div>
                               <!-- 展開時の編集エリア -->
                               <div
-                                x-show="item._open"
+                                x-show="openIdx === idx"
                                 class="px-3 pb-3 pt-1 border-t border-[#ebeef0] space-y-2"
                               >
                                 <div>
