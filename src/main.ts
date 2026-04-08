@@ -82,6 +82,7 @@ interface CmsComponent {
   selectFolder(): Promise<void>
   loadSiteData(): Promise<void>
   ensureInitialData(): Promise<void>
+  createPage(): void
   openPage(page: ContentData): Promise<void>
   openContentType(type: ContentType): Promise<void>
   openContent(item: ContentData): Promise<void>
@@ -102,6 +103,8 @@ interface CmsComponent {
   copyFromLang(sourceLang: string): Promise<void>
   getTranslationStatus(): Promise<Array<{ code: string; flag: string; status: string }>>
   refreshTranslationStatus(): Promise<void>
+  availableCategories: Array<{ id: string; label: string }>
+  availableTags: Array<{ id: string; label: string }>
   // コンテンツタイプ管理
   showTypeEditor: boolean
   editingType: ContentType | null
@@ -163,7 +166,12 @@ Alpine.data('cms', () => {
 
     // タクソノミー管理
     showTaxonomyEditor: false,
-    taxonomyData: { categories: [], tags: [] },
+    taxonomyData: {
+      categories: [] as Array<{ id: string; label: string }>,
+      tags: [] as Array<{ id: string; label: string }>,
+    },
+    availableCategories: [] as Array<{ id: string; label: string }>,
+    availableTags: [] as Array<{ id: string; label: string }>,
 
     // 言語設定
     showLangEditor: false,
@@ -322,6 +330,15 @@ Alpine.data('cms', () => {
       this.currentLang = this.languages.default || 'ja'
       this.contentTypes = await this.fs.readContentTypes()
       this.pages = await this.fs.readPages(this.currentLang)
+      // カテゴリ・タグ読み込み
+      const cats = await this.fs.readJson<{ items: Array<{ id: string; label: string }> }>(
+        'content/taxonomies/categories.json',
+      )
+      const tags = await this.fs.readJson<{ items: Array<{ id: string; label: string }> }>(
+        'content/taxonomies/tags.json',
+      )
+      this.availableCategories = cats?.items || []
+      this.availableTags = tags?.items || []
     },
 
     /** 初回起動時に必要なフォルダ・ファイルを自動作成 */
@@ -393,6 +410,32 @@ Alpine.data('cms', () => {
     },
 
     // --- 固定ページ ---
+
+    createPage() {
+      const id = prompt('ページID（URLに使用、例: contact）')
+      if (!id || !id.trim()) return
+      const slug = id.trim().toLowerCase().replace(/\s+/g, '-')
+      const page: ContentData = {
+        id: slug,
+        title: '',
+        status: 'draft',
+        body: '',
+        _meta: {
+          createdAt: new Date().toISOString().split('T')[0],
+          updatedAt: new Date().toISOString().split('T')[0],
+          author: this.authorName,
+        },
+      }
+      this.currentPage = page
+      this.currentType = null
+      this.currentFields = []
+      this.showRevisionPanel = false
+      this.showPreviewPanel = false
+      this.view = 'page-edit'
+      this.editData = { ...page }
+      this.initEditor('')
+      this.updateHash()
+    },
 
     async openPage(page: ContentData) {
       this.currentPage = page
@@ -793,7 +836,16 @@ Alpine.data('cms', () => {
     openTypeEditor(type?: ContentType) {
       this.editingType = type
         ? JSON.parse(JSON.stringify(type))
-        : { id: '', label: '', slug: '', fields: [], pagination: 10 }
+        : {
+            id: '',
+            label: '',
+            slug: '',
+            pagination: 10,
+            fields: [
+              { key: 'title', label: 'タイトル', type: 'text', required: true },
+              { key: 'body', label: '本文', type: 'richtext' },
+            ],
+          }
       this.showTypeEditor = true
     },
 
@@ -865,6 +917,8 @@ Alpine.data('cms', () => {
         items: this.taxonomyData.tags,
       })
       this.showTaxonomyEditor = false
+      this.availableCategories = this.taxonomyData.categories
+      this.availableTags = this.taxonomyData.tags
       this.showToast('カテゴリ・タグを保存しました')
     },
 

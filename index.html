@@ -73,6 +73,10 @@
                     <span x-text="page.title || page.id" class="truncate"></span>
                   </button>
                 </template>
+                <button @click="createPage()" class="gh-nav-item w-full text-[#505a66]">
+                  <i data-lucide="plus" class="w-[18px] h-[18px]"></i>
+                  <span>ページ追加</span>
+                </button>
 
                 <div class="gh-nav-section">コンテンツ</div>
                 <template x-for="type in contentTypes" :key="type.id">
@@ -316,6 +320,38 @@
                   </select>
                   <button @click="savePage()" class="gh-btn-green text-[13px]">更新</button>
                 </div>
+
+                <!-- カテゴリ・タグ選択 -->
+                <template x-if="currentType?.hasCategory || currentType?.hasTag">
+                  <div class="flex flex-wrap gap-4 mb-5 pb-4 border-b border-[#ebeef0]">
+                    <template x-if="currentType?.hasCategory && availableCategories.length">
+                      <div>
+                        <label class="gh-label">カテゴリ</label>
+                        <select x-model="editData.category" class="gh-select-light text-xs">
+                          <option value="">未分類</option>
+                          <template x-for="cat in availableCategories" :key="cat.id">
+                            <option :value="cat.label" x-text="cat.label"></option>
+                          </template>
+                        </select>
+                      </div>
+                    </template>
+                    <template x-if="currentType?.hasTag && availableTags.length">
+                      <div class="flex-1">
+                        <label class="gh-label">タグ</label>
+                        <div class="flex flex-wrap gap-1.5">
+                          <template x-for="tag in availableTags" :key="tag.id">
+                            <button
+                              @click="editData.tags = editData.tags || []; editData.tags.includes(tag.label) ? editData.tags = editData.tags.filter(t => t !== tag.label) : editData.tags.push(tag.label)"
+                              class="px-2 py-0.5 rounded border text-xs transition-all"
+                              :class="(editData.tags||[]).includes(tag.label) ? 'bg-[#30cf43]/10 border-[#30cf43] text-[#30cf43]' : 'border-[#ebeef0] text-[#7c8b9a] hover:border-[#ced4da]'"
+                              x-text="tag.label"
+                            ></button>
+                          </template>
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+                </template>
 
                 <template x-for="field in currentFields" :key="field.key">
                   <div>
