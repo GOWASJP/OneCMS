@@ -1011,6 +1011,28 @@
               <label class="gh-label">1ページあたりの件数</label>
               <input type="number" x-model="editingType.pagination" class="gh-input-light w-24" />
             </div>
+            <div class="flex flex-wrap gap-4 mt-1">
+              <label class="flex items-center gap-1.5 text-xs cursor-pointer">
+                <input type="checkbox" x-model="editingType.hasDate" class="accent-[#30cf43]" />
+                投稿日
+              </label>
+              <label class="flex items-center gap-1.5 text-xs cursor-pointer">
+                <input
+                  type="checkbox"
+                  x-model="editingType.hasThumbnail"
+                  class="accent-[#30cf43]"
+                />
+                サムネイル
+              </label>
+              <label class="flex items-center gap-1.5 text-xs cursor-pointer">
+                <input type="checkbox" x-model="editingType.hasCategory" class="accent-[#30cf43]" />
+                カテゴリ
+              </label>
+              <label class="flex items-center gap-1.5 text-xs cursor-pointer">
+                <input type="checkbox" x-model="editingType.hasTag" class="accent-[#30cf43]" />
+                タグ
+              </label>
+            </div>
             <div class="h-px bg-[#ebeef0] my-2"></div>
             <h3 class="text-sm font-bold">フィールド定義</h3>
             <template x-for="(f, idx) in editingType?.fields || []" :key="idx">
