@@ -881,8 +881,18 @@ Alpine.data('cms', () => {
     async saveType() {
       if (!this.fs || !this.editingType) return
       const t = this.editingType
+      if (!t.label.trim()) {
+        this.showToast('ラベルを入力してください')
+        return
+      }
       if (!t.id) {
-        t.id = t.slug || t.label.toLowerCase().replace(/\s+/g, '-')
+        t.id =
+          t.slug ||
+          t.label
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '-')
+            .replace(/-+/g, '-')
       }
       if (!t.slug) t.slug = t.id
       await this.fs.writeJson(`content/_types/${t.id}.json`, t)
@@ -892,17 +902,22 @@ Alpine.data('cms', () => {
     },
 
     async deleteType() {
-      if (!this.fs || !this.editingType?.id) return
+      const typeId = this.editingType?.id || this.currentType?.id
+      if (!this.fs || !typeId) return
       const dir = await this.fs.getDir('content/_types')
       if (dir) {
         try {
-          await dir.removeEntry(`${this.editingType.id}.json`)
+          await dir.removeEntry(`${typeId}.json`)
         } catch {
           /* skip */
         }
       }
       this.contentTypes = await this.fs.readContentTypes()
       this.showTypeEditor = false
+      if (this.currentType?.id === typeId) {
+        this.currentType = null
+        this.view = 'welcome'
+      }
       this.showToast('削除しました')
     },
 
