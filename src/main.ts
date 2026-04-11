@@ -398,17 +398,61 @@ Alpine.data('cms', () => {
       const type = this.contentTypes.find((t) => t.id === typeId)
       if (!type) return []
       const fields = this.resolveFields(type.fieldGroupIds, type.fields)
-      const result: Array<{ label: string; code: string; note?: string }> = [
-        { label: 'タイトル', code: '{{page.title}}' },
-        { label: 'スラッグ', code: '{{page.slug}}' },
-        { label: '本文 (HTML)', code: '{{{page.body}}}', note: '三重括弧でエスケープせず出力' },
-        { label: '公開日', code: '{{page.publishedAt}}' },
-        {
+      const result: Array<{ label: string; code: string; note?: string }> = []
+
+      // タイトル・スラッグ・id は ContentData の必須要素なので常に表示
+      result.push({ label: 'タイトル', code: '{{page.title}}' })
+      result.push({ label: 'スラッグ', code: '{{page.slug}}' })
+      result.push({ label: 'ID', code: '{{page.id}}' })
+
+      // 本文: hasBody === true、または fieldGroups から body フィールドが見つかる場合
+      const hasBody =
+        type.hasBody === true || fields.some((f) => f.key === 'body' && f.type === 'richtext')
+      if (hasBody) {
+        result.push({
+          label: '本文 (HTML)',
+          code: '{{{page.body}}}',
+          note: '三重括弧でエスケープせず出力',
+        })
+      }
+      // 公開日: hasDate === true のときのみ
+      if (type.hasDate) {
+        result.push({ label: '公開日', code: '{{page.publishedAt}}' })
+        result.push({
           label: '公開日（フォーマット）',
           code: "{{formatDate page.publishedAt 'YYYY年MM月DD日'}}",
-        },
-        { label: 'カテゴリ', code: '{{page.category}}' },
-      ]
+        })
+      }
+      // カテゴリ: hasCategory === true のときのみ
+      if (type.hasCategory) {
+        result.push({ label: 'カテゴリ', code: '{{page.category}}' })
+      }
+      // タグ: hasTag === true のときのみ
+      if (type.hasTag) {
+        result.push({
+          label: 'タグ（ループ）',
+          code: '{{#each page.tags}}\n  <span class="tag">{{this}}</span>\n{{/each}}',
+        })
+      }
+      // サムネイル画像: hasThumbnail === true のときのみ
+      if (type.hasThumbnail) {
+        result.push({
+          label: 'サムネイル画像',
+          code: '{{#if page.image}}<img src="{{page.image}}" alt="{{page.title}}">{{/if}}',
+        })
+      }
+      // メタ情報は常に存在する
+      result.push({ label: '更新日', code: '{{page._meta.updatedAt}}' })
+      result.push({ label: '著者', code: '{{page._meta.author}}' })
+
+      // 詳細ページのURL（list.hbs 内で使う想定）
+      result.push({
+        label: '詳細ページURL',
+        code: `/${type.slug}/{{slug}}/`,
+        note: 'list.hbs の {{#each items}} ループ内で使用',
+      })
+
+      // ここからカスタムフィールド（フィールドグループから解決）
       for (const f of fields) {
         if (['title', 'body', 'slug', 'publishedAt', 'category'].includes(f.key)) continue
         if (f.type === 'image') {
