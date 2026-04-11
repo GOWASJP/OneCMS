@@ -18,6 +18,15 @@ declare module '@editorjs/nested-list'
 declare module '@editorjs/link'
 declare module '@editorjs/embed'
 
+declare module '*.hbs?raw' {
+  const content: string
+  export default content
+}
+declare module '*.json?raw' {
+  const content: string
+  export default content
+}
+
 interface FileSystemDirectoryHandle {
   requestPermission(descriptor?: { mode?: string }): Promise<PermissionState>
 }
