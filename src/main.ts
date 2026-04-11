@@ -126,6 +126,7 @@ interface CmsComponent {
   ensureInitialData(): Promise<void>
   createPage(): void
   confirmCreatePage(): void
+  openHomePage(): Promise<void>
   showPageCreator: boolean
   editingPageId: string
   editingPageTitle: string
@@ -443,7 +444,9 @@ Alpine.data('cms', () => {
     /** URLハッシュを現在のビュー状態で更新 */
     updateHash() {
       let hash = ''
-      if (this.view === 'page-list') {
+      if (this.view === 'page-edit' && this.currentPage?.id === 'index') {
+        hash = '#/home'
+      } else if (this.view === 'page-list') {
         hash = '#/pages'
       } else if (this.view === 'page-edit' && this.currentPage) {
         hash = `#/pages/${this.currentPage.id}`
@@ -476,7 +479,9 @@ Alpine.data('cms', () => {
 
       const parts = hash.replace('#/', '').split('/')
 
-      if (parts[0] === 'settings') {
+      if (parts[0] === 'home') {
+        await this.openHomePage()
+      } else if (parts[0] === 'settings') {
         this.view = 'settings'
       } else if (parts[0] === 'templates') {
         await this.loadTemplateEditor()
@@ -764,6 +769,27 @@ Alpine.data('cms', () => {
       this.currentType = null
       this.view = 'page-list'
       this.updateHash()
+    },
+
+    /** トップページ（content/pages/index/{lang}.json）を直接編集モードで開く */
+    async openHomePage() {
+      if (!this.fs) return
+      this.pages = await this.fs.readPages(this.currentLang)
+      let home = this.pages.find((p) => p.id === 'index')
+      if (!home) {
+        home = {
+          id: 'index',
+          title: 'トップページ',
+          body: '',
+          status: 'published',
+          _meta: {
+            createdAt: new Date().toISOString().split('T')[0],
+            updatedAt: new Date().toISOString().split('T')[0],
+            author: this.authorName,
+          },
+        }
+      }
+      await this.openPage(home)
     },
 
     openPagesConfigEditor() {
@@ -1388,10 +1414,14 @@ Alpine.data('cms', () => {
       return LANG_STATUS_ICONS[status] || ''
     },
 
-    /** 親ページとして選択可能なページ一覧を返す（自身と自身の子孫を除外して循環参照を防ぐ） */
+    /** 親ページとして選択可能なページ一覧を返す
+     *  - 自身と自身の子孫を除外して循環参照を防ぐ
+     *  - トップページ(index)はルート専用なので選択肢から除外
+     */
     availableParentPages(): ContentData[] {
       const currentId = this.currentPage?.id || ''
-      if (!currentId) return this.pages.slice()
+      const excludeIndex = (p: ContentData): boolean => p.id !== 'index'
+      if (!currentId) return this.pages.filter(excludeIndex)
       // currentId の子孫 id 集合を計算（BFS）
       const descendants = new Set<string>()
       const queue: string[] = [currentId]
@@ -1404,13 +1434,18 @@ Alpine.data('cms', () => {
           }
         }
       }
-      return this.pages.filter((p) => p.id !== currentId && !descendants.has(p.id))
+      return this.pages.filter(
+        (p) => p.id !== currentId && p.id !== 'index' && !descendants.has(p.id),
+      )
     },
 
-    /** ページ一覧を親子ツリー構造の順序（DFS）で depth 付きで返す */
+    /** ページ一覧を親子ツリー構造の順序（DFS）で depth 付きで返す
+     *  トップページ(index)は独立メニューから編集するため一覧からは除外
+     */
     pagesTree(): Array<ContentData & { depth: number }> {
+      const visiblePages = this.pages.filter((p) => p.id !== 'index')
       const byParent = new Map<string, ContentData[]>()
-      for (const p of this.pages) {
+      for (const p of visiblePages) {
         const parent = (p.parent as string | undefined) || ''
         if (!byParent.has(parent)) byParent.set(parent, [])
         byParent.get(parent)!.push(p)
@@ -1435,7 +1470,7 @@ Alpine.data('cms', () => {
       visit('', 0)
       // 親が存在しない孤立ページも拾う（親IDが不正な場合）
       const collected = new Set(result.map((p) => p.id))
-      for (const p of this.pages) {
+      for (const p of visiblePages) {
         if (!collected.has(p.id)) {
           result.push({ ...p, depth: 0 })
         }

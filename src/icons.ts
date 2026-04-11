@@ -86,4 +86,7 @@ export {
 
   // ツリー
   CornerDownRight,
+
+  // トップ
+  Home,
 } from 'lucide'
