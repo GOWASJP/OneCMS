@@ -479,23 +479,64 @@ dist/
 
 テンプレートはすべて `.hbs` 形式。標準提供ヘルパー：
 
-| ヘルパー           | 用途                 |
-| ------------------ | -------------------- |
-| `formatDate`       | 日付フォーマット     |
-| `truncate`         | 文字数制限           |
-| `eq` / `gt` / `lt` | 比較演算             |
-| `breadcrumbJsonLd` | パンくずJSON-LD      |
-| `articleJsonLd`    | 記事JSON-LD          |
-| `hreflangTags`     | hreflangタグ自動生成 |
-| `langSwitcher`     | 言語切替リンク       |
+| ヘルパー           | 用途                                            |
+| ------------------ | ----------------------------------------------- |
+| `formatDate`       | 日付フォーマット                                |
+| `truncate`         | 文字数制限                                      |
+| `eq` / `gt` / `lt` | 比較演算                                        |
+| `breadcrumbJsonLd` | パンくずJSON-LD                                 |
+| `articleJsonLd`    | 記事JSON-LD                                     |
+| `hreflangTags`     | hreflangタグ自動生成                            |
+| `langSwitcher`     | 言語切替リンク                                  |
+| `faviconTag`       | ファビコン link タグ                            |
+| `latestItems`      | 指定コンテンツタイプの最新 N 件取得（URL 付き） |
 
-### 11.2 3層構造
+### 11.2 役割分担と 3 層構造
 
-| 対象   | できること                             |
-| ------ | -------------------------------------- |
-| 編集者 | カラーテーマ・フォントの選択のみ       |
-| 業者   | HTMLテンプレートの直接カスタマイズ     |
-| 開発者 | テンプレートパックの作成・GitHubで配布 |
+ONE CMS は「編集者」と「製作者」の役割を明確に分けて運用することを推奨します。
+
+| 役割                                   | 担当                   | 触るもの                                                                                                     |
+| -------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **編集者**（非エンジニア）             | 日々の運用             | 管理画面のフォーム・一覧のみ。記事の作成・更新、トップページに掲載する情報の選択、画像差し替え、公開         |
+| **製作者**（Web 制作会社・エンジニア） | 初期構築・デザイン改修 | `templates/*.hbs`、`content/_types/*.json`、`content/_fieldGroups/*.json`、`content/pages/_config.json`、CSS |
+| **開発者**（OSS 貢献者）               | 本体拡張               | テンプレートパックの作成・GitHub で配布、ONE CMS 本体への PR                                                 |
+
+編集者は「どの情報を出すか」を決め、製作者は「どう見せるか」を決めます。レイアウトやデザインは全て製作者の責任範囲で、編集者が触るのはフォームに入った値だけです。
+
+### 11.3 トップページ構築の推奨フロー（製作者向け）
+
+トップページは「製作者が事前に定義したフィールドを、編集者が埋めるだけ」で構成します。以下の手順で構築します。
+
+1. **フィールドグループを定義**: サイドバー「フィールド」から、トップページに必要な情報の入れ物を作成。例: `home-hero`（見出し・画像）、`home-carousel`（スライド配列）、`home-banners`（バナー配列）
+2. **ページ設定でトップページに紐付け**: `content/pages/_config.json` の `overrides.index.fieldGroupIds` に上記フィールドグループのIDを列挙。`overrides.index.hasBody` を `false` にして Editor.js を無効化
+3. **`templates/home.hbs` を作成**: サイドバー「テンプレート」から `home.hbs` を作成（存在すれば自動的にトップページに使用される）。`{{page.fieldName}}` でフィールド値を参照、`{{#each ...}}` で配列展開、`{{latestItems 'news' 5 lang}}` でコンテンツタイプの最新件を取得
+4. **CSS を配置**: `templates/_components/styles.hbs` もしくは別パーシャルで CSS を定義
+5. **編集者に引き渡し**: 編集者はサイドバー「トップページ」から、定義したフィールドの値を埋めるだけ
+
+### 11.4 ページ設定の override 形式
+
+`content/pages/_config.json` の構造：
+
+```json
+{
+  "hasBody": true,
+  "fieldGroupIds": [],
+  "overrides": {
+    "index": {
+      "hasBody": false,
+      "fieldGroupIds": ["home-hero", "home-carousel", "home-featured-news", "home-banners"]
+    },
+    "about": {
+      "hasBody": true,
+      "fieldGroupIds": ["company-profile"]
+    }
+  }
+}
+```
+
+- ルートの `hasBody` / `fieldGroupIds` は全ページのデフォルト
+- `overrides.{pageId}` で特定のページを上書き
+- トップページ以外も個別のフィールド構成を持てる（例: 会社概要ページに専用フィールドを付けるなど）
 
 ---
 
