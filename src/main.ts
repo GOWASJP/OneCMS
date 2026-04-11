@@ -19,6 +19,7 @@ import { RevisionManager } from './revision.ts'
 import { saveImage } from './image.ts'
 import { saveFolderHandle, restoreFolderHandle } from './storage.ts'
 import { createEditor, editorJsonToHtml, htmlToEditorJson, type EditorData } from './editor.ts'
+import { INITIAL_TEMPLATES } from './initial-templates.ts'
 import {
   APP_NAME,
   STORAGE_AUTHOR_KEY,
@@ -801,67 +802,11 @@ Alpine.data('cms', () => {
         ],
       })
 
-      // サンプルテンプレート: templates/home.hbs（製作者が自由にカスタマイズ可能）
-      const homeTemplate = `{{!-- トップページ用テンプレート（サンプル） --}}
-{{!-- 製作者はこのファイルを自由に書き換えてデザインを構築できます --}}
-
-<section class="home-hero">
-  {{#if page.heroImage}}<img src="{{page.heroImage}}" alt="">{{/if}}
-  <div class="container">
-    {{#if page.heroHeading}}<h1>{{page.heroHeading}}</h1>{{/if}}
-    {{#if page.heroSubheading}}<p>{{page.heroSubheading}}</p>{{/if}}
-  </div>
-</section>
-
-{{#if page.carousel.length}}
-<section class="home-carousel">
-  <div class="container">
-    <div class="carousel-track">
-      {{#each page.carousel}}
-        <figure class="carousel-slide">
-          {{#if link}}<a href="{{link}}">{{/if}}
-          {{#if image}}<img src="{{image}}" alt="{{caption}}">{{/if}}
-          {{#if caption}}<figcaption>{{caption}}</figcaption>{{/if}}
-          {{#if link}}</a>{{/if}}
-        </figure>
-      {{/each}}
-    </div>
-  </div>
-</section>
-{{/if}}
-
-<section class="home-news">
-  <div class="container">
-    <h2>お知らせ</h2>
-    <ul class="news-list">
-      {{#each (latestItems 'news' 5 lang)}}
-        <li>
-          <a href="{{url}}">
-            <time datetime="{{publishedAt}}">{{formatDate publishedAt}}</time>
-            <span>{{title}}</span>
-          </a>
-        </li>
-      {{/each}}
-    </ul>
-    <p class="news-more"><a href="/{{#unless (eq lang defaultLang)}}{{lang}}/{{/unless}}news/">すべて見る</a></p>
-  </div>
-</section>
-
-{{#if page.banners.length}}
-<section class="home-banners">
-  <div class="container">
-    <ul class="banner-grid">
-      {{#each page.banners}}
-        <li>
-          <a href="{{link}}"><img src="{{image}}" alt="{{alt}}"></a>
-        </li>
-      {{/each}}
-    </ul>
-  </div>
-</section>
-{{/if}}
-`
-      await this.fs.writeText('templates/home.hbs', homeTemplate)
+      // 初期テンプレート一式を書き出し（INITIAL_TEMPLATES は templates/ 配下の実ファイルから
+      // Vite の ?raw import で取り込んだもの）。製作者はインストール後に自由にカスタマイズ可能
+      for (const [path, content] of Object.entries(INITIAL_TEMPLATES)) {
+        await this.fs.writeText(path, content)
+      }
     },
 
     // --- 固定ページ ---
@@ -1227,7 +1172,9 @@ Alpine.data('cms', () => {
         return
       }
       if (this.currentType) {
-        const missing = this.currentType.fields
+        // currentFields は fieldGroupIds を解決済みの実フィールド一覧
+        // （currentType.fields は optional のため直接参照すると TypeError になる）
+        const missing = (this.currentFields || [])
           .filter((f) => f.required && f.key !== 'title')
           .filter((f) => {
             const val = (this.editData as any)[f.key]
@@ -1679,6 +1626,7 @@ Alpine.data('cms', () => {
 
     addFieldToType() {
       if (!this.editingType) return
+      if (!this.editingType.fields) this.editingType.fields = []
       this.editingType.fields.push({
         key: '',
         label: '',
@@ -1821,7 +1769,7 @@ Alpine.data('cms', () => {
       lines.push(`<article>`)
       lines.push(`  <a href="{{url}}">`)
       lines.push(`    <h2>{{page.title}}</h2>`)
-      for (const f of type.fields) {
+      for (const f of type.fields || []) {
         if (f.key === 'title' || f.key === 'body') continue
         if (f.type === 'image') {
           lines.push(`    {{#if page.${f.key}}}<img src="{{page.${f.key}}}" alt="">{{/if}}`)
@@ -1850,7 +1798,7 @@ Alpine.data('cms', () => {
       lines.push('')
       lines.push('{{!-- 詳細ページ (detail.hbs) --}}')
       lines.push(`<h1>{{page.title}}</h1>`)
-      for (const f of type.fields) {
+      for (const f of type.fields || []) {
         if (f.key === 'title') continue
         if (f.key === 'body') {
           lines.push(`{{{page.body}}}`)
