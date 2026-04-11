@@ -268,18 +268,6 @@
                   <button @click="savePage()" class="gh-btn-green text-xs">更新</button>
                 </div>
               </template>
-              <select @change="switchLang($event.target.value)" class="gh-select-light">
-                <template
-                  x-for="locale in languages.locales || [{code:'ja', label:'日本語'}]"
-                  :key="locale.code"
-                >
-                  <option
-                    :value="locale.code"
-                    :selected="locale.code === currentLang"
-                    x-text="locale.flag + ' ' + locale.code.toUpperCase()"
-                  ></option>
-                </template>
-              </select>
               <button @click="exportSite()" class="gh-btn-green text-[13px]">
                 <i data-lucide="upload" class="w-3.5 h-3.5"></i>
                 書き出し
