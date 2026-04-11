@@ -68,8 +68,16 @@
               <div class="space-y-0.5">
                 <div class="gh-nav-section">ページ</div>
                 <button
+                  @click="openHomePage()"
+                  :class="view === 'page-edit' && currentPage?.id === 'index' ? 'gh-nav-active' : ''"
+                  class="gh-nav-item w-full"
+                >
+                  <i data-lucide="home" class="w-[18px] h-[18px]"></i>
+                  <span>トップページ</span>
+                </button>
+                <button
                   @click="loadPageList()"
-                  :class="view === 'page-list' ? 'gh-nav-active' : ''"
+                  :class="view === 'page-list' || (view === 'page-edit' && currentPage?.id !== 'index') ? 'gh-nav-active' : ''"
                   class="gh-nav-item w-full"
                 >
                   <i data-lucide="file-text" class="w-[18px] h-[18px]"></i>
@@ -433,55 +441,73 @@
                     </div>
                   </template>
 
-                  <!-- スラッグ -->
-                  <div>
-                    <label class="gh-label">スラッグ</label>
-                    <input
-                      type="text"
-                      x-model="editData.slug"
-                      :placeholder="editData.id"
-                      class="gh-input-light text-xs w-full"
-                    />
-                    <p
-                      class="text-[10px] text-[var(--ds-text-muted)] mt-0.5"
-                      x-text="'ID: ' + (currentPage?.id || editData.id)"
-                    ></p>
-                  </div>
+                  <!-- トップページの場合は固定値のみ表示 -->
+                  <template x-if="currentPage?.id === 'index'">
+                    <div>
+                      <label class="gh-label">URL</label>
+                      <p class="text-xs text-[var(--ds-text-body)] font-mono">/</p>
+                      <p class="text-[10px] text-[var(--ds-text-muted)] mt-1">
+                        トップページは常にサイトのルートに配置されます
+                      </p>
+                    </div>
+                  </template>
 
-                  <!-- 親ページ -->
-                  <div>
-                    <label class="gh-label">親ページ</label>
-                    <select
-                      @change="editData.parent = $event.target.value"
-                      class="gh-input-light text-xs w-full"
-                    >
-                      <option value="" :selected="!editData.parent">なし（ルート）</option>
-                      <template x-for="p in availableParentPages()" :key="p.id">
-                        <option
-                          :value="p.id"
-                          :selected="editData.parent === p.id"
-                          x-text="p.title || p.id"
-                        ></option>
-                      </template>
-                    </select>
-                    <p class="text-[10px] text-[var(--ds-text-muted)] mt-1 leading-snug">
-                      子ページは親ページのURL構造を引き継ぎます。現在のURL:
-                      <code
-                        class="text-[var(--ds-text-heading)] font-mono"
-                        x-text="pagePathPreview()"
-                      ></code>
-                    </p>
-                  </div>
+                  <!-- トップページ以外はスラッグ・親ページを編集可 -->
+                  <template x-if="currentPage?.id !== 'index'">
+                    <div class="space-y-5">
+                      <!-- スラッグ -->
+                      <div>
+                        <label class="gh-label">スラッグ</label>
+                        <input
+                          type="text"
+                          x-model="editData.slug"
+                          :placeholder="editData.id"
+                          class="gh-input-light text-xs w-full"
+                        />
+                        <p
+                          class="text-[10px] text-[var(--ds-text-muted)] mt-0.5"
+                          x-text="'ID: ' + (currentPage?.id || editData.id)"
+                        ></p>
+                      </div>
+
+                      <!-- 親ページ -->
+                      <div>
+                        <label class="gh-label">親ページ</label>
+                        <select
+                          @change="editData.parent = $event.target.value"
+                          class="gh-input-light text-xs w-full"
+                        >
+                          <option value="" :selected="!editData.parent">なし（ルート）</option>
+                          <template x-for="p in availableParentPages()" :key="p.id">
+                            <option
+                              :value="p.id"
+                              :selected="editData.parent === p.id"
+                              x-text="p.title || p.id"
+                            ></option>
+                          </template>
+                        </select>
+                        <p class="text-[10px] text-[var(--ds-text-muted)] mt-1 leading-snug">
+                          子ページは親ページのURL構造を引き継ぎます。現在のURL:
+                          <code
+                            class="text-[var(--ds-text-heading)] font-mono"
+                            x-text="pagePathPreview()"
+                          ></code>
+                        </p>
+                      </div>
+                    </div>
+                  </template>
 
                   <div class="h-px bg-[var(--ds-border-default)]"></div>
 
-                  <!-- 削除 -->
-                  <button
-                    @click="deletePage()"
-                    class="text-[var(--ds-danger-600)] text-xs hover:underline w-full text-left"
-                  >
-                    このページを削除
-                  </button>
+                  <!-- 削除（トップページは削除不可） -->
+                  <template x-if="currentPage?.id !== 'index'">
+                    <button
+                      @click="deletePage()"
+                      class="text-[var(--ds-danger-600)] text-xs hover:underline w-full text-left"
+                    >
+                      このページを削除
+                    </button>
+                  </template>
                 </div>
               </div>
             </template>
