@@ -2493,6 +2493,12 @@
                           </template>
                         </select>
                         <template x-if="templateRefSelectedTypeId">
+                          <p
+                            class="text-[10px] text-[var(--ds-primary-600)] font-semibold px-1 mb-2"
+                            x-text="(contentTypes.find(t => t.id === templateRefSelectedTypeId)?.label || '') + ' (' + templateRefTypeFields().length + '項目)'"
+                          ></p>
+                        </template>
+                        <template x-if="templateRefSelectedTypeId">
                           <div class="space-y-1.5">
                             <template x-for="item in templateRefTypeFields()" :key="item.label">
                               <div>
