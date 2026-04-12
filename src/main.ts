@@ -2746,16 +2746,21 @@ async function loadAssetBlobUrl(
  *  </head> の直前に <script> として挿入し、DOM に書かれている Tailwind
  *  クラスを実行時にスキャンして CSS を生成させる。
  */
+/** Tailwind 4 ランタイムを Blob URL 経由で注入。インライン <script> だと
+ *  JS 内の </ パターンが HTML パーサーと干渉するため、外部スクリプト参照にする。
+ */
 function injectTailwindRuntime(html: string): string {
-  // インライン <script> 内に </script> や </ が含まれると HTML パーサーが
-  // そこでタグ終了と見なしてスクリプトが途中で切れる。<\/ にエスケープすれば安全
-  const safeJs = tailwindBrowserJs.replace(/<\//g, '<\\/')
-  const scriptTag = `<script>${safeJs}</script>`
+  if (!tailwindBlobUrl) {
+    const blob = new Blob([tailwindBrowserJs], { type: 'text/javascript' })
+    tailwindBlobUrl = URL.createObjectURL(blob)
+  }
+  const scriptTag = `<script src="${tailwindBlobUrl}"></script>`
   if (html.includes('</head>')) {
     return html.replace('</head>', `${scriptTag}\n</head>`)
   }
   return scriptTag + html
 }
+let tailwindBlobUrl: string | null = null
 
 /** プレビュー用に作成された Blob URL のリスト（再生成時に revoke する） */
 const previewBlobUrls: string[] = []
