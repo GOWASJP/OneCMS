@@ -27,6 +27,7 @@ import galleryHbs from '../templates/_components/gallery.hbs?raw'
 import heroHbs from '../templates/_components/hero.hbs?raw'
 import tabsHbs from '../templates/_components/tabs.hbs?raw'
 import timelineHbs from '../templates/_components/timeline.hbs?raw'
+import seoHbs from '../templates/_components/seo.hbs?raw'
 
 /** 相対パス → 内容 のマップ。ensureInitialData でそのまま書き出される */
 export const INITIAL_TEMPLATES: Record<string, string> = {
@@ -51,4 +52,5 @@ export const INITIAL_TEMPLATES: Record<string, string> = {
   'templates/_components/hero.hbs': heroHbs,
   'templates/_components/tabs.hbs': tabsHbs,
   'templates/_components/timeline.hbs': timelineHbs,
+  'templates/_components/seo.hbs': seoHbs,
 }
