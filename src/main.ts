@@ -2747,11 +2747,13 @@ async function loadAssetBlobUrl(
  *  クラスを実行時にスキャンして CSS を生成させる。
  */
 function injectTailwindRuntime(html: string): string {
-  const scriptTag = `<script>\n${tailwindBrowserJs}\n</script>`
+  // インライン <script> 内に </script> や </ が含まれると HTML パーサーが
+  // そこでタグ終了と見なしてスクリプトが途中で切れる。<\/ にエスケープすれば安全
+  const safeJs = tailwindBrowserJs.replace(/<\//g, '<\\/')
+  const scriptTag = `<script>${safeJs}</script>`
   if (html.includes('</head>')) {
     return html.replace('</head>', `${scriptTag}\n</head>`)
   }
-  // head が無い場合は HTML の先頭に追加
   return scriptTag + html
 }
 
