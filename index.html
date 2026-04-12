@@ -295,16 +295,42 @@
             <!-- ウェルカム -->
             <template x-if="view === 'welcome'">
               <div class="flex items-center justify-center h-full">
-                <div class="text-center">
-                  <i
-                    data-lucide="layout-dashboard"
-                    class="w-10 h-10 mx-auto mb-3 text-[var(--ds-text-placeholder)]"
-                  ></i>
-                  <p
-                    class="text-sm text-[var(--ds-text-muted)]"
-                    x-text="folderHandle ? 'サイドバーからページを選択' : 'フォルダを選択して開始'"
-                  ></p>
-                </div>
+                <!-- フォルダ選択前 -->
+                <template x-if="!folderHandle">
+                  <div class="text-center max-w-md">
+                    <div
+                      class="w-14 h-14 rounded-xl bg-[var(--ds-primary-100)] text-[var(--ds-primary-600)] mx-auto mb-4 flex items-center justify-center"
+                    >
+                      <i data-lucide="folder-open" class="w-7 h-7"></i>
+                    </div>
+                    <h2 class="text-lg font-bold text-[var(--ds-text-heading)] mb-2">
+                      サイトフォルダを選択
+                    </h2>
+                    <p class="text-sm text-[var(--ds-text-muted)] mb-4 leading-relaxed">
+                      サイトのデータが保存されているフォルダ（または新しい空のフォルダ）を選んでください。初回はフォルダ内に必要なファイルが自動で生成されます。
+                    </p>
+                    <button @click="selectFolder()" class="gh-btn-green text-sm px-6 py-2.5">
+                      <i data-lucide="folder-open" class="w-4 h-4"></i>
+                      フォルダを選択
+                    </button>
+                    <p class="text-[11px] text-[var(--ds-text-muted)] mt-4 leading-snug">
+                      ※
+                      ブラウザから「このサイトに変更の保存を許可する場所を選択してください」と表示されますが、これは
+                      CMS
+                      がファイルを読み書きするフォルダを指定するためのものです。安全にご利用いただけます。
+                    </p>
+                  </div>
+                </template>
+                <!-- フォルダ選択済み -->
+                <template x-if="folderHandle">
+                  <div class="text-center">
+                    <i
+                      data-lucide="layout-dashboard"
+                      class="w-10 h-10 mx-auto mb-3 text-[var(--ds-text-placeholder)]"
+                    ></i>
+                    <p class="text-sm text-[var(--ds-text-muted)]">サイドバーからページを選択</p>
+                  </div>
+                </template>
               </div>
             </template>
 
