@@ -3025,6 +3025,7 @@ const TEMPLATE_DESCRIPTIONS: Record<string, string> = {
   'hero.hbs': 'ヒーローセクション',
   'tabs.hbs': 'タブ UI',
   'timeline.hbs': 'タイムライン UI',
+  'seo.hbs': 'SEO・OGP・構造化データ（head 内）',
 }
 
 /** 翻訳ステータスバッジ用の static SVG（Lucide のアイコンデータから抽出したパス） */
