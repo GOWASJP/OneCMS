@@ -153,6 +153,7 @@ interface CmsComponent {
   selectFolder(): Promise<void>
   loadSiteData(): Promise<void>
   ensureInitialData(): Promise<void>
+  ensureMissingTemplates(): Promise<void>
   createPage(): void
   confirmCreatePage(): void
   openHomePage(): Promise<void>
@@ -1371,6 +1372,8 @@ Alpine.data('cms', () => {
 
       // 初回起動時に初期データを自動生成
       await this.ensureInitialData()
+      // バンドル内のテンプレートで未作成のものがあれば補完（既存ファイルは上書きしない）
+      await this.ensureMissingTemplates()
 
       this.siteConfig = (await this.fs.readJson<SiteConfig>(PATH_SITE_CONFIG)) || {
         name: '',
@@ -1552,6 +1555,19 @@ Alpine.data('cms', () => {
       // Vite の ?raw import で取り込んだもの）。製作者はインストール後に自由にカスタマイズ可能
       for (const [path, content] of Object.entries(INITIAL_TEMPLATES)) {
         await this.fs.writeText(path, content)
+      }
+    },
+
+    /** バンドル内のテンプレートで、ユーザーフォルダに存在しないファイルだけ補完。
+     *  既存ファイルは絶対に上書きしない。新しいテンプレートが ONE CMS に追加されたとき、
+     *  既存プロジェクトにも自動で反映されるための仕組み。 */
+    async ensureMissingTemplates() {
+      if (!this.fs) return
+      for (const [path, content] of Object.entries(INITIAL_TEMPLATES)) {
+        const existing = await this.fs.readText(path)
+        if (existing === null) {
+          await this.fs.writeText(path, content)
+        }
       }
     },
 
