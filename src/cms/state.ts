@@ -48,6 +48,8 @@ export function createInitialState(): Partial<CmsComponent> & ThisType<CmsCompon
     contentTypes: [],
 
     contentItems: [],
+    contentPage: 1,
+    contentPerPage: 50,
 
     currentPage: null,
 

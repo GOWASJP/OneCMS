@@ -144,13 +144,35 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     this.showRevisionPanel = false
     this.showPreviewPanel = false
     this.view = 'content-list'
-    this.contentItems = await this.fs.readContentList(type.id, this.currentLang)
+    this.contentItems = await this.fs.readContentListLight(type.id, this.currentLang)
+    this.contentPage = 1
     this.updateHash()
   },
 
+  /** 一覧の軽量インデックスをフルデータから作り直す（ずれた場合の復旧用） */
+  async rebuildContentList() {
+    if (!this.fs || !this.currentType) return
+    await this.fs.rebuildContentIndexForLang(this.currentType.id, this.currentLang)
+    this.contentItems = await this.fs.readContentListLight(this.currentType.id, this.currentLang)
+    this.contentPage = 1
+    this.showToast('一覧を再構築しました')
+  },
+
   async openContent(item: ContentData) {
+    // 一覧は軽量インデックス（表示用の最小データ）なので、編集前に必ずフルデータを読み直す
+    let data = item
+    if (this.fs && this.currentType) {
+      const full = await this.fs.readContent(this.currentType.id, item.id, this.currentLang)
+      if (full) {
+        data = full
+      } else {
+        this.showToast('コンテンツが見つかりませんでした')
+        await this.openContentType(this.currentType)
+        return
+      }
+    }
     this.suppressDirty = true
-    this.currentPage = item
+    this.currentPage = data
     this.currentFields = this.resolveFields(
       this.currentType?.fieldGroupIds,
       this.currentType?.fields,
@@ -158,7 +180,7 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     this.showRevisionPanel = false
     this.showPreviewPanel = false
     this.view = 'content-edit'
-    this.editData = { slug: '', category: '', tags: [], ...item }
+    this.editData = { slug: '', category: '', tags: [], ...data }
     // 配列系フィールドの初期化
     for (const f of this.currentFields) {
       if (
@@ -175,7 +197,7 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
         this.currentType?.hasBody ||
         this.currentFields.some((f) => f.type === 'richtext' && f.key === 'body')
       if (hasBody) {
-        this.initEditor((item as any)._editorJson || item.body || '')
+        this.initEditor((data as any)._editorJson || data.body || '')
       }
       this.resetDirty()
       this.suppressDirty = false
@@ -347,7 +369,10 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
       await this.fs.saveContent(this.currentType.id, pageId, this.currentLang, this.editData)
       // 自動保存中はリストを再読込すると現在の編集 editData を差し替えてしまうので抑制
       if (!silent) {
-        this.contentItems = await this.fs.readContentList(this.currentType.id, this.currentLang)
+        this.contentItems = await this.fs.readContentListLight(
+          this.currentType.id,
+          this.currentLang,
+        )
       }
     } else {
       await this.fs.savePage(pageId, this.currentLang, this.editData)
@@ -382,7 +407,9 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
         }
       }
     }
-    this.contentItems = await this.fs.readContentList(this.currentType.id, this.currentLang)
+    await this.fs.removeFromContentIndex(this.currentType.id, this.currentPage.id)
+    this.contentItems = await this.fs.readContentListLight(this.currentType.id, this.currentLang)
+    this.contentPage = 1
     this.currentPage = null
     this.view = 'content-list'
     this.showToast('削除しました')
