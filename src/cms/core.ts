@@ -32,6 +32,7 @@ import {
 } from './dom.ts'
 import { TEMPLATE_DESCRIPTIONS } from './template-reference.ts'
 import { readMeta, writeMeta, runMigrations, currentMeta } from '../migrations.ts'
+import { runExtensionInit } from './extensions.ts'
 
 /** アップロードファイルの拡張子を判定（MIME タイプ優先、フォールバックでファイル名）。
  *  jpeg は jpg に正規化する。判定できなければ空文字を返す。 */
@@ -99,6 +100,9 @@ export const coreMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
       if (this.view !== 'page-edit' && this.view !== 'content-edit') return
       this.markDirty()
     })
+
+    // 拡張（Pro / プラグイン）の初期化。無料コアでは no-op
+    await runExtensionInit(this)
 
     if (!this.authorName) return
     const handle = await restoreFolderHandle()

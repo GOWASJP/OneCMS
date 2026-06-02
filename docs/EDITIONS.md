@@ -67,3 +67,9 @@
 - ライセンス透かし：`VITE_LICENSE_ID=<顧客ID>` で書き出し HTML に generator メタ + ID を注入（`src/export.ts`）
 - 継続更新の基盤：データ移行（`src/migrations.ts`）・既定テンプレートの差分提案アップデート（`src/cms/output.ts`）
 - 大規模対応：一覧の軽量インデックス + ページング、書き出しの並列化・増分化、検索インデックスの言語別分割
+- 拡張ポイント：`src/cms/extensions.ts`（`extensionMixin` / `extensionNavItems` / `runExtensionInit`）。Pro を**フォークせず上積み**するための差し込み口。詳細は `docs/PRO-OVERLAY.md`
+
+## Pro 開発のリポジトリ構成
+
+- 無料コア = この公開リポ（MIT）。**Pro ソースは置かない**。
+- Pro = **非公開リポ**で開発。無料コアを git submodule で取り込み、`src/cms/extensions.ts` と `index.html` を上書きして `VITE_EDITION=pro` でビルド（手順は `docs/PRO-OVERLAY.md`）。
