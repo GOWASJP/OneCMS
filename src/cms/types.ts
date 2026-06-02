@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import EditorJS from '@editorjs/editorjs'
 import {
   type SiteConfig,
@@ -9,6 +8,8 @@ import {
   type FieldGroup,
   type RevisionEntry,
   type ExportResult,
+  type Menu,
+  type MenuData,
 } from '../types.ts'
 import { type EditorData } from '../editor.ts'
 import { FileSystem } from '../fs.ts'
@@ -169,9 +170,9 @@ export interface CmsComponent {
   modalOk(): void
   modalCancel(): void
   // メニュー管理
-  menuData: { menus: any[] }
+  menuData: MenuData
   currentMenuId: string
-  currentMenu: any
+  currentMenu: Menu | null
   loadMenus(): Promise<void>
   saveMenus(): Promise<void>
   addMenu(): Promise<void>
