@@ -164,6 +164,17 @@
                   <i data-lucide="settings" class="w-[18px] h-[18px]"></i>
                   <span>設定</span>
                 </button>
+                <!-- 拡張（Pro/プラグイン）が追加するナビ項目。無料コアでは空 -->
+                <template x-for="ext in extensionNavItems" :key="ext.id">
+                  <button
+                    @click="view = ext.view; updateHash()"
+                    :class="view === ext.view ? 'gh-nav-active' : ''"
+                    class="gh-nav-item w-full"
+                  >
+                    <i :data-lucide="ext.icon" class="w-[18px] h-[18px]"></i>
+                    <span x-text="ext.label"></span>
+                  </button>
+                </template>
               </div>
             </template>
           </nav>

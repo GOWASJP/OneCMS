@@ -15,6 +15,7 @@ import { contentMixin } from './cms/content.ts'
 import { contentTypesMixin } from './cms/content-types.ts'
 import { structureMixin } from './cms/structure.ts'
 import { outputMixin } from './cms/output.ts'
+import { extensionMixin } from './cms/extensions.ts'
 import { refreshIcons } from './cms/dom.ts'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -32,6 +33,8 @@ Alpine.data('cms', () => {
     ...contentTypesMixin,
     ...structureMixin,
     ...outputMixin,
+    // Pro / プラグインの拡張（無料コアでは空。Pro ビルドが alias で差し替える）
+    ...extensionMixin,
 
     get viewTitle(): string {
       if (this.view === 'page-edit' && this.currentPage)

@@ -1,4 +1,5 @@
 import type { CmsComponent } from './types.ts'
+import { extensionNavItems } from './extensions.ts'
 import { type SiteConfig, type ContentData, type FieldGroup } from '../types.ts'
 import {
   STORAGE_AUTHOR_KEY,
@@ -196,6 +197,9 @@ export function createInitialState(): Partial<CmsComponent> & ThisType<CmsCompon
     dataSchemaVersion: SCHEMA_VERSION,
     lastBackupPath: null,
     schemaWarning: null,
+
+    // 拡張（Pro/プラグイン）が追加するサイドバー項目（無料コアでは空）
+    extensionNavItems,
 
     categorySnippets: CATEGORY_SNIPPETS,
     tagSnippets: TAG_SNIPPETS,
