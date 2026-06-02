@@ -31,6 +31,42 @@ import {
 } from './dom.ts'
 import { TEMPLATE_DESCRIPTIONS } from './template-reference.ts'
 
+/** アップロードファイルの拡張子を判定（MIME タイプ優先、フォールバックでファイル名）。
+ *  jpeg は jpg に正規化する。判定できなければ空文字を返す。 */
+function detectAssetExt(
+  file: File,
+  mimeExtMap: Record<string, string>,
+  filenameRe: RegExp,
+): string {
+  const byMime = mimeExtMap[file.type]
+  if (byMime) return byMime
+  const match = file.name.match(filenameRe)
+  return match ? match[1].toLowerCase().replace('jpeg', 'jpg') : ''
+}
+
+/** assets/files/ 配下の旧アセット（baseName.<ext>）を削除する。
+ *  keepExt を渡すとその拡張子は残す（拡張子切替時の掃除に使用）。 */
+async function removeOldAssetFiles(
+  fs: FileSystem,
+  baseName: string,
+  exts: string[],
+  keepExt?: string,
+): Promise<void> {
+  const filesDir = await fs.getDir(PATH_ASSETS_FILES)
+  if (!filesDir) return
+  for (const ext of exts) {
+    if (ext === keepExt) continue
+    try {
+      await filesDir.removeEntry(`${baseName}.${ext}`)
+    } catch {
+      /* 存在しなければ無視 */
+    }
+  }
+}
+
+const FAVICON_EXTS = ['ico', 'png', 'svg', 'webp']
+const LOGO_EXTS = ['png', 'svg', 'webp', 'jpg']
+
 export const coreMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
   /** テンプレート/コンポーネントの役割説明（ファイル名 → 説明） */
   templateDescription(name: string): string {
@@ -490,19 +526,17 @@ export const coreMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     const input = event.target as HTMLInputElement
     const file = input.files?.[0]
     if (!file || !this.fs) return
-    // 拡張子判定（MIMEタイプ優先、フォールバックでファイル名）
-    const mimeExtMap: Record<string, string> = {
-      'image/x-icon': 'ico',
-      'image/vnd.microsoft.icon': 'ico',
-      'image/png': 'png',
-      'image/svg+xml': 'svg',
-      'image/webp': 'webp',
-    }
-    let ext = mimeExtMap[file.type]
-    if (!ext) {
-      const match = file.name.match(/\.(ico|png|svg|webp)$/i)
-      ext = match ? match[1].toLowerCase() : ''
-    }
+    const ext = detectAssetExt(
+      file,
+      {
+        'image/x-icon': 'ico',
+        'image/vnd.microsoft.icon': 'ico',
+        'image/png': 'png',
+        'image/svg+xml': 'svg',
+        'image/webp': 'webp',
+      },
+      /\.(ico|png|svg|webp)$/i,
+    )
     if (!ext) {
       this.showToast('ico / png / svg / webp 形式のみアップロードできます', 5000)
       input.value = ''
@@ -510,17 +544,7 @@ export const coreMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     }
     try {
       // 古い拡張子のファビコンが残っていたら削除（拡張子切替時）
-      const filesDir = await this.fs.getDir(PATH_ASSETS_FILES)
-      if (filesDir) {
-        for (const oldExt of ['ico', 'png', 'svg', 'webp']) {
-          if (oldExt === ext) continue
-          try {
-            await filesDir.removeEntry(`favicon.${oldExt}`)
-          } catch {
-            /* skip */
-          }
-        }
-      }
+      await removeOldAssetFiles(this.fs, 'favicon', FAVICON_EXTS, ext)
       const buffer = await file.arrayBuffer()
       const path = `${PATH_ASSETS_FILES}/favicon.${ext}`
       await this.fs.writeBlob(path, new Blob([buffer]))
@@ -541,16 +565,7 @@ export const coreMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
   async removeFavicon() {
     if (!this.fs) return
     if (!(await this.showConfirm('ファビコンを削除しますか？'))) return
-    const filesDir = await this.fs.getDir(PATH_ASSETS_FILES)
-    if (filesDir) {
-      for (const ext of ['ico', 'png', 'svg', 'webp']) {
-        try {
-          await filesDir.removeEntry(`favicon.${ext}`)
-        } catch {
-          /* skip */
-        }
-      }
-    }
+    await removeOldAssetFiles(this.fs, 'favicon', FAVICON_EXTS)
     delete (this.siteConfig as any).favicon
     await this.fs.writeJson(PATH_SITE_CONFIG, this.siteConfig)
     clearFaviconBlobUrl()
@@ -564,17 +579,16 @@ export const coreMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     const input = event.target as HTMLInputElement
     const file = input.files?.[0]
     if (!file || !this.fs) return
-    const mimeExtMap: Record<string, string> = {
-      'image/png': 'png',
-      'image/svg+xml': 'svg',
-      'image/webp': 'webp',
-      'image/jpeg': 'jpg',
-    }
-    let ext = mimeExtMap[file.type]
-    if (!ext) {
-      const match = file.name.match(/\.(png|svg|webp|jpe?g)$/i)
-      ext = match ? match[1].toLowerCase().replace('jpeg', 'jpg') : ''
-    }
+    const ext = detectAssetExt(
+      file,
+      {
+        'image/png': 'png',
+        'image/svg+xml': 'svg',
+        'image/webp': 'webp',
+        'image/jpeg': 'jpg',
+      },
+      /\.(png|svg|webp|jpe?g)$/i,
+    )
     if (!ext) {
       this.showToast('png / svg / webp / jpg 形式のみアップロードできます', 5000)
       input.value = ''
@@ -582,17 +596,7 @@ export const coreMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     }
     try {
       // 古い拡張子のロゴが残っていたら削除（拡張子切替時）
-      const filesDir = await this.fs.getDir(PATH_ASSETS_FILES)
-      if (filesDir) {
-        for (const oldExt of ['png', 'svg', 'webp', 'jpg']) {
-          if (oldExt === ext) continue
-          try {
-            await filesDir.removeEntry(`logo.${oldExt}`)
-          } catch {
-            /* skip */
-          }
-        }
-      }
+      await removeOldAssetFiles(this.fs, 'logo', LOGO_EXTS, ext)
       const buffer = await file.arrayBuffer()
       const path = `${PATH_ASSETS_FILES}/logo.${ext}`
       await this.fs.writeBlob(path, new Blob([buffer]))
@@ -612,16 +616,7 @@ export const coreMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
   async removeLogo() {
     if (!this.fs) return
     if (!(await this.showConfirm('ロゴを削除しますか？'))) return
-    const filesDir = await this.fs.getDir(PATH_ASSETS_FILES)
-    if (filesDir) {
-      for (const ext of ['png', 'svg', 'webp', 'jpg']) {
-        try {
-          await filesDir.removeEntry(`logo.${ext}`)
-        } catch {
-          /* skip */
-        }
-      }
-    }
+    await removeOldAssetFiles(this.fs, 'logo', LOGO_EXTS)
     delete (this.siteConfig as any).logo
     await this.fs.writeJson(PATH_SITE_CONFIG, this.siteConfig)
     if (this.logoBlobUrl) URL.revokeObjectURL(this.logoBlobUrl)

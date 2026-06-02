@@ -1,6 +1,14 @@
 import Handlebars from 'handlebars'
 import type { FileSystem } from './fs.ts'
-import type { SiteConfig, Languages, ContentType, ExportFile, ContentData } from './types.ts'
+import type {
+  SiteConfig,
+  Languages,
+  ContentType,
+  ExportFile,
+  ContentData,
+  MenuData,
+  MenuItem,
+} from './types.ts'
 
 // Alpine.js CDN ビルド: 公開サイトの dist/assets/js/ に書き出す
 import alpineJs from 'alpinejs/dist/cdn.min.js?raw'
@@ -146,7 +154,7 @@ export class Exporter {
 
     // テーマCSS変数
     hbs.registerHelper('themeStyles', function (site: Record<string, unknown>) {
-      const theme = (site as any)?.theme || {}
+      const theme = (site?.theme as Record<string, string | undefined> | undefined) || {}
       const primary = theme.primary || '#2563eb'
       const secondary = theme.secondary || '#1e40af'
       const fontFamily =
@@ -331,11 +339,11 @@ export class Exporter {
     let step = 0
 
     // メニューデータ読み込み
-    const menuData = (await this.fs.readJson<any>('content/menus.json')) || {
+    const menuData = (await this.fs.readJson<MenuData>('content/menus.json')) || {
       menus: [],
     }
     // 全メニューを site.menus.<id> でアクセス可能にする
-    const menus: Record<string, any[]> = {}
+    const menus: Record<string, MenuItem[]> = {}
     for (const menu of menuData.menus || []) {
       menus[menu.id] = menu.items || []
     }

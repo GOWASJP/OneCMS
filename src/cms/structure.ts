@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { CmsComponent } from './types.ts'
-import { type ContentData } from '../types.ts'
+import { type ContentData, type MenuData } from '../types.ts'
 import {
   PATH_LANGUAGES,
   PATH_MENUS,
@@ -143,7 +143,7 @@ export const structureMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
 
   async loadMenus() {
     if (!this.fs) return
-    const data = await this.fs.readJson<any>(PATH_MENUS)
+    const data = await this.fs.readJson<MenuData>(PATH_MENUS)
     this.menuData = data || { menus: [] }
     if (this.menuData.menus.length && !this.currentMenuId) {
       this.selectMenu(this.menuData.menus[0].id)
@@ -154,7 +154,7 @@ export const structureMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
 
   selectMenu(id: string) {
     this.currentMenuId = id
-    this.currentMenu = this.menuData.menus.find((m: any) => m.id === id) || null
+    this.currentMenu = this.menuData.menus.find((m) => m.id === id) || null
   },
 
   async addMenu() {
@@ -167,7 +167,7 @@ export const structureMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '')
     // 英数字がない場合（日本語名等）は連番IDを生成
-    const existingIds = new Set(this.menuData.menus.map((m: any) => m.id))
+    const existingIds = new Set(this.menuData.menus.map((m) => m.id))
     let id = slug
     if (!id) {
       let n = 1
@@ -182,7 +182,7 @@ export const structureMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
   async deleteMenu() {
     if (!this.currentMenu) return
     if (!(await this.showConfirm(`「${this.currentMenu.name}」を削除しますか？`))) return
-    this.menuData.menus = this.menuData.menus.filter((m: any) => m.id !== this.currentMenuId)
+    this.menuData.menus = this.menuData.menus.filter((m) => m.id !== this.currentMenuId)
     this.currentMenu = null
     this.currentMenuId = ''
     if (this.menuData.menus.length) this.selectMenu(this.menuData.menus[0].id)
@@ -234,7 +234,7 @@ export const structureMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     if (!this.fs) return
     // orderを再計算
     for (const menu of this.menuData.menus) {
-      menu.items.forEach((item: any, i: number) => {
+      menu.items.forEach((item, i) => {
         item.order = i
       })
     }

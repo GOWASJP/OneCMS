@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { CmsComponent } from './types.ts'
 import { type SiteConfig, type ContentData, type FieldGroup } from '../types.ts'
 import { STORAGE_AUTHOR_KEY, STORAGE_THEME_KEY, type ThemeMode } from '../constants.ts'
@@ -81,11 +80,11 @@ export function createInitialState(): Partial<CmsComponent> & ThisType<CmsCompon
     } | null,
 
     // メニュー管理
-    menuData: { menus: [] } as any,
+    menuData: { menus: [] },
 
     currentMenuId: '',
 
-    currentMenu: null as any,
+    currentMenu: null,
 
     // ページ作成
     showPageCreator: false,
