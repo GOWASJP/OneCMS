@@ -33,6 +33,8 @@ export interface CmsComponent {
   pages: ContentData[]
   contentTypes: ContentType[]
   contentItems: ContentData[]
+  contentPage: number
+  contentPerPage: number
   currentPage: ContentData | null
   currentType: ContentType | null
   currentFields: FieldDefinition[]
@@ -134,6 +136,7 @@ export interface CmsComponent {
   savePagesConfig(): Promise<void>
   openPage(page: ContentData): Promise<void>
   openContentType(type: ContentType): Promise<void>
+  rebuildContentList(): Promise<void>
   openContent(item: ContentData): Promise<void>
   createContent(): void
   initEditor(bodyData: string | EditorData): void

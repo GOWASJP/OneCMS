@@ -23,6 +23,20 @@ async function collectEntries(
 /** 同時に開くファイル数の上限。読み取りを並列化しつつハンドルの過剰確保を防ぐ。 */
 const READ_CONCURRENCY = 32
 
+/** 軽量インデックスの1件分（一覧表示に必要な最小フィールド） */
+interface LightEntry {
+  title: string
+  status?: string
+  publishedAt?: string
+  createdAt?: string
+}
+
+/** content/{type}/_index.json の構造（言語 → id → 軽量エントリ） */
+interface ContentIndex {
+  v: number
+  byLang: Record<string, Record<string, LightEntry>>
+}
+
 /** 配列を一定数ずつ並列処理する（読み取り専用の高速化用） */
 async function mapBatched<T, R>(
   items: T[],
@@ -242,7 +256,7 @@ export class FileSystem {
     await this.writeJson(`content/pages/${pageId}/${lang}.json`, data)
   }
 
-  /** コンテンツを保存 */
+  /** コンテンツを保存（軽量インデックスも同時に更新） */
   async saveContent(
     typeId: string,
     contentId: string,
@@ -250,6 +264,109 @@ export class FileSystem {
     data: ContentData,
   ): Promise<void> {
     await this.writeJson(`content/${typeId}/${contentId}/${lang}.json`, data)
+    await this.upsertContentIndex(typeId, lang, contentId, data)
+  }
+
+  // ---- 軽量インデックス（管理画面の一覧高速化用。表示専用で、編集時はフルJSONを読み直す） ----
+
+  private _indexPath(typeId: string): string {
+    return `content/${typeId}/_index.json`
+  }
+
+  private _toLight(item: ContentData): LightEntry {
+    return {
+      title: item.title || '',
+      status: item.status,
+      publishedAt: item.publishedAt,
+      createdAt: item._meta?.createdAt,
+    }
+  }
+
+  /** タイプのインデックスを読み込み（無ければ null） */
+  async readContentIndex(typeId: string): Promise<ContentIndex | null> {
+    return this.readJson<ContentIndex>(this._indexPath(typeId))
+  }
+
+  /**
+   * 軽量一覧を返す。インデックスがあれば1ファイル読込で返し、
+   * 無ければフル読込してインデックスを生成する。表示専用（編集時は readContent でフル取得）。
+   */
+  async readContentListLight(typeId: string, lang: string): Promise<ContentData[]> {
+    const idx = await this.readContentIndex(typeId)
+    if (idx?.byLang?.[lang]) {
+      const list = Object.entries(idx.byLang[lang]).map(
+        ([id, e]) =>
+          ({
+            id,
+            title: e.title,
+            status: e.status,
+            publishedAt: e.publishedAt,
+            _meta: { createdAt: e.createdAt },
+          }) as ContentData,
+      )
+      list.sort((a, b) =>
+        (b.publishedAt || b._meta?.createdAt || '').localeCompare(
+          a.publishedAt || a._meta?.createdAt || '',
+        ),
+      )
+      return list
+    }
+    // フォールバック: フル読込してインデックスを生成
+    const items = await this.readContentList(typeId, lang)
+    await this.rebuildContentIndexForLang(typeId, lang, items)
+    return items
+  }
+
+  /** 指定タイプ・言語のフルデータからインデックスを作り直す（再構築・自己修復用） */
+  async rebuildContentIndexForLang(
+    typeId: string,
+    lang: string,
+    items?: ContentData[],
+  ): Promise<ContentData[]> {
+    const list = items || (await this.readContentList(typeId, lang))
+    const idx = (await this.readContentIndex(typeId)) || { v: 1, byLang: {} }
+    const byId: Record<string, LightEntry> = {}
+    for (const item of list) byId[item.id] = this._toLight(item)
+    idx.byLang[lang] = byId
+    await this.writeJson(this._indexPath(typeId), idx)
+    return list
+  }
+
+  /** 1件のインデックスエントリを追加・更新 */
+  async upsertContentIndex(
+    typeId: string,
+    lang: string,
+    id: string,
+    item: ContentData,
+  ): Promise<void> {
+    const idx = (await this.readContentIndex(typeId)) || { v: 1, byLang: {} }
+    if (!idx.byLang[lang]) idx.byLang[lang] = {}
+    idx.byLang[lang][id] = this._toLight({ ...item, id })
+    await this.writeJson(this._indexPath(typeId), idx)
+  }
+
+  /** 指定 id を全言語のインデックスから削除 */
+  async removeFromContentIndex(typeId: string, id: string): Promise<void> {
+    const idx = await this.readContentIndex(typeId)
+    if (!idx) return
+    let changed = false
+    for (const lang of Object.keys(idx.byLang)) {
+      if (idx.byLang[lang] && id in idx.byLang[lang]) {
+        delete idx.byLang[lang][id]
+        changed = true
+      }
+    }
+    if (changed) await this.writeJson(this._indexPath(typeId), idx)
+  }
+
+  /** 1件のフルデータを読み込む（一覧クリック時に正確なデータで開くため） */
+  async readContent(typeId: string, id: string, lang: string): Promise<ContentData | null> {
+    const json = await this.readJson<Record<string, unknown>>(
+      `content/${typeId}/${id}/${lang}.json`,
+    )
+    if (!json) return null
+    const parsed = ContentDataSchema.safeParse({ ...json, id })
+    return parsed.success ? parsed.data : null
   }
 
   /** フィールドグループ一覧を読み込み */

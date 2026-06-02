@@ -29,7 +29,8 @@ export const structureMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     this.pages = await this.fs.readPages(lang)
 
     if (this.currentType) {
-      this.contentItems = await this.fs.readContentList(this.currentType.id, lang)
+      this.contentItems = await this.fs.readContentListLight(this.currentType.id, lang)
+      this.contentPage = 1
     }
 
     // 現在開いているページを切替先言語で再読み込み
