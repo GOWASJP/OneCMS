@@ -59,14 +59,24 @@
           </div>
 
           <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-0.5">
-            <button @click="selectFolder()" class="gh-nav-item w-full">
-              <i data-lucide="folder-open" class="w-[18px] h-[18px]"></i>
-              <span x-text="folderHandle ? 'フォルダ変更' : 'フォルダを選択'"></span>
-            </button>
-
             <template x-if="folderHandle">
               <div class="space-y-0.5">
-                <div class="gh-nav-section">ページ</div>
+                <!-- ダッシュボード（拡張: placement === 'top'）。無料コアでは空 -->
+                <template
+                  x-for="ext in extensionNavItems.filter((e) => e.placement === 'top')"
+                  :key="ext.id"
+                >
+                  <button
+                    @click="view = ext.view; updateHash()"
+                    :class="view === ext.view ? 'gh-nav-active' : ''"
+                    class="gh-nav-item w-full"
+                  >
+                    <i :data-lucide="ext.icon" class="w-[18px] h-[18px]"></i>
+                    <span x-text="ext.label"></span>
+                  </button>
+                </template>
+
+                <div class="gh-nav-section">つくる</div>
                 <button
                   @click="openHomePage()"
                   :class="view === 'page-edit' && currentPage?.id === 'index' ? 'gh-nav-active' : ''"
@@ -84,7 +94,6 @@
                   <span>ページ一覧</span>
                 </button>
 
-                <div class="gh-nav-section">投稿タイプ</div>
                 <template x-for="type in contentTypes" :key="type.id">
                   <button
                     @click="openContentType(type)"
@@ -103,8 +112,7 @@
                   <span>タイプ追加</span>
                 </button>
 
-                <div class="h-px bg-[var(--ds-border-default)] my-3"></div>
-
+                <div class="gh-nav-section">ととのえる</div>
                 <button
                   @click="loadMenus()"
                   :class="view === 'menus' ? 'gh-nav-active' : ''"
@@ -148,6 +156,26 @@
                     <span>テンプレート</span>
                   </button>
                 </template>
+
+                <!-- 点検・ツール（拡張: placement !== 'top'）。項目があるときだけ見出し -->
+                <template x-if="extensionNavItems.some((e) => e.placement !== 'top')">
+                  <div class="gh-nav-section">点検・ツール</div>
+                </template>
+                <template
+                  x-for="ext in extensionNavItems.filter((e) => e.placement !== 'top')"
+                  :key="ext.id"
+                >
+                  <button
+                    @click="view = ext.view; updateHash()"
+                    :class="view === ext.view ? 'gh-nav-active' : ''"
+                    class="gh-nav-item w-full"
+                  >
+                    <i :data-lucide="ext.icon" class="w-[18px] h-[18px]"></i>
+                    <span x-text="ext.label"></span>
+                  </button>
+                </template>
+
+                <div class="gh-nav-section">設定</div>
                 <button
                   @click="view = 'site-info'; updateHash()"
                   :class="view === 'site-info' ? 'gh-nav-active' : ''"
@@ -164,17 +192,6 @@
                   <i data-lucide="settings" class="w-[18px] h-[18px]"></i>
                   <span>設定</span>
                 </button>
-                <!-- 拡張（Pro/プラグイン）が追加するナビ項目。無料コアでは空 -->
-                <template x-for="ext in extensionNavItems" :key="ext.id">
-                  <button
-                    @click="view = ext.view; updateHash()"
-                    :class="view === ext.view ? 'gh-nav-active' : ''"
-                    class="gh-nav-item w-full"
-                  >
-                    <i :data-lucide="ext.icon" class="w-[18px] h-[18px]"></i>
-                    <span x-text="ext.label"></span>
-                  </button>
-                </template>
               </div>
             </template>
           </nav>
@@ -294,6 +311,14 @@
                   <button @click="savePage()" class="gh-btn-green text-xs">保存</button>
                 </div>
               </template>
+              <button
+                @click="selectFolder()"
+                class="gh-btn-outline text-[13px]"
+                title="サイトのデータフォルダを切り替えます"
+              >
+                <i data-lucide="folder-open" class="w-3.5 h-3.5"></i>
+                <span x-text="folderHandle ? 'サイト変更' : 'サイトを選択'"></span>
+              </button>
               <button @click="exportSite()" class="gh-btn-green text-[13px]">
                 <i data-lucide="upload" class="w-3.5 h-3.5"></i>
                 書き出し
