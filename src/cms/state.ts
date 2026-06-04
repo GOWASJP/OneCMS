@@ -83,20 +83,6 @@ export function createInitialState(): Partial<CmsComponent> & ThisType<CmsCompon
 
     currentFieldGroup: null as FieldGroup | null,
 
-    // ページ設定
-    pagesConfig: { hasBody: true, fieldGroupIds: [] } as {
-      hasBody?: boolean
-      fieldGroupIds?: string[]
-    },
-
-    showPagesConfigEditor: false,
-
-    editingPagesConfig: null as {
-      hasBody?: boolean
-      fieldGroupIds?: string[]
-      overrides?: Record<string, { hasBody?: boolean; fieldGroupIds?: string[] }>
-    } | null,
-
     // メニュー管理
     menuData: { menus: [] },
 

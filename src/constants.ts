@@ -56,7 +56,6 @@ export const PATH_SITE_CONFIG = 'content/site.json'
 export const PATH_LANGUAGES = 'content/languages.json'
 export const PATH_TYPES_DIR = 'content/_types'
 export const PATH_PAGES_DIR = 'content/pages'
-export const PATH_PAGES_CONFIG = 'content/pages/_config.json'
 // テーマ（出力サイトのテンプレートパック）の置き場。themes/<theme-id>/ 配下に theme.json と *.hbs。
 export const PATH_THEMES = 'themes'
 // 旧構造（フラットな単一テーマ）。移行・フォールバック用。

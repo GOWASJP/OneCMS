@@ -3,7 +3,7 @@ import type { CmsComponent } from './types.ts'
 import { type ContentData, type ContentType, type FieldDefinition } from '../types.ts'
 import { createEditor, editorJsonToHtml, htmlToEditorJson, type EditorData } from '../editor.ts'
 import { saveImage } from '../image.ts'
-import { PATH_PAGES_CONFIG, PATH_ASSETS_FILES } from '../constants.ts'
+import { PATH_ASSETS_FILES } from '../constants.ts'
 
 export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
   // --- 固定ページ ---
@@ -26,6 +26,8 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
       title: this.editingPageTitle || slug,
       status: 'draft',
       body: '',
+      category: '',
+      tags: [],
       _meta: {
         createdAt: new Date().toISOString().split('T')[0],
         updatedAt: new Date().toISOString().split('T')[0],
@@ -35,14 +37,17 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     this.suppressDirty = true
     this.currentPage = page
     this.currentType = null
-    this.currentFields = this.resolveFields(this.pagesConfig?.fieldGroupIds, [])
+    this.currentFields = this.fieldGroupsForContext('page', page.id).flatMap((g) => g.fields)
     this.showRevisionPanel = false
     this.showPreviewPanel = false
     this.view = 'page-edit'
     this.editData = { ...page }
-    if (this.pagesConfig?.hasBody !== false) {
-      this.initEditor('')
+    for (const f of this.currentFields) {
+      if (['relation', 'repeater', 'imagelist', 'multiselect'].includes(f.type)) {
+        ;(this.editData as any)[f.key] = []
+      }
     }
+    this.initEditor('')
     this.updateHash()
     this.$nextTick(() => {
       this.resetDirty()
@@ -72,36 +77,18 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     await this.openPage(front)
   },
 
-  openPagesConfigEditor() {
-    this.editingPagesConfig = JSON.parse(JSON.stringify(this.pagesConfig))
-    if (!this.editingPagesConfig!.fieldGroupIds) this.editingPagesConfig!.fieldGroupIds = []
-    this.showPagesConfigEditor = true
-  },
-
-  async savePagesConfig() {
-    if (!this.fs || !this.editingPagesConfig) return
-    await this.fs.writeJson(PATH_PAGES_CONFIG, this.editingPagesConfig)
-    this.pagesConfig = JSON.parse(JSON.stringify(this.editingPagesConfig))
-    this.showPagesConfigEditor = false
-    this.editingPagesConfig = null
-    this.showToast('ページ設定を保存しました')
-  },
-
   async openPage(page: ContentData) {
     this.suppressDirty = true
     this.currentPage = page
     this.currentType = null
-    // ページ ID 別の override があれば優先、無ければ共通 pagesConfig
-    const override = this.pagesConfig?.overrides?.[page.id]
-    const effectiveFieldGroupIds = override?.fieldGroupIds ?? this.pagesConfig?.fieldGroupIds
-    const effectiveHasBody = override?.hasBody ?? this.pagesConfig?.hasBody ?? true
-    this.currentFields = this.resolveFields(effectiveFieldGroupIds, [])
+    // 全ページ共通のタイトル・本文・サムネイル・カテゴリ・タグに加え、
+    // 表示条件がこのページに一致するフィールドグループのカスタム項目を表示する
+    this.currentFields = this.fieldGroupsForContext('page', page.id).flatMap((g) => g.fields)
     this.showRevisionPanel = false
     this.showPreviewPanel = false
     this.view = 'page-edit'
-    this.editData = { slug: '', ...page }
+    this.editData = { slug: '', category: '', tags: [], ...page }
     // relation / repeater / imagelist / multiselect フィールドが未初期化の場合は空配列を注入
-    // （x-model のチェックボックス配列や splice 呼び出しが undefined で動作しないため）
     for (const f of this.currentFields) {
       if (
         (['relation', 'repeater', 'imagelist', 'multiselect'].includes(f.type) &&
@@ -111,14 +98,8 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
         ;(this.editData as any)[f.key] = []
       }
     }
-    // Editor.js の有効/無効は effectiveHasBody（pagesConfig / ページ別 override）だけで決める。
-    // フロントページも通常ページと同じ扱い（特別扱いしない）。
-    if (effectiveHasBody) {
-      this.initEditor((page as any)._editorJson || page.body || '')
-    } else if (this.editor) {
-      this.editor.destroy()
-      this.editor = null
-    }
+    // フロントページも通常ページと同じ扱い（特別扱いしない）。本文エディタは常に有効。
+    this.initEditor((page as any)._editorJson || page.body || '')
     this.updateHash()
     this.refreshTranslationStatus()
     this.$nextTick(() => {
@@ -165,10 +146,7 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     }
     this.suppressDirty = true
     this.currentPage = data
-    this.currentFields = this.resolveFields(
-      this.currentType?.fieldGroupIds,
-      this.currentType?.fields,
-    )
+    this.currentFields = this.currentType ? this.fieldsForType(this.currentType) : []
     this.showRevisionPanel = false
     this.showPreviewPanel = false
     this.view = 'content-edit'
@@ -185,12 +163,8 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     }
     // Alpine template x-if の入れ子展開を待つ
     setTimeout(() => {
-      const hasBody =
-        this.currentType?.hasBody ||
-        this.currentFields.some((f) => f.type === 'richtext' && f.key === 'body')
-      if (hasBody) {
-        this.initEditor((data as any)._editorJson || data.body || '')
-      }
+      // 本文は全タイプ共通の既定項目なので常に初期化
+      this.initEditor((data as any)._editorJson || data.body || '')
       this.resetDirty()
       this.suppressDirty = false
     }, 100)
@@ -218,19 +192,12 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     }
     this.suppressDirty = true
     this.currentPage = item
-    this.currentFields = this.resolveFields(
-      this.currentType?.fieldGroupIds,
-      this.currentType?.fields,
-    )
+    this.currentFields = this.currentType ? this.fieldsForType(this.currentType) : []
     this.editData = { ...item }
     this.view = 'content-edit'
     setTimeout(() => {
-      const hasBody =
-        this.currentType?.hasBody ||
-        this.currentFields.some((f) => f.type === 'richtext' && f.key === 'body')
-      if (hasBody) {
-        this.initEditor('')
-      }
+      // 本文は全タイプ共通の既定項目なので常に初期化
+      this.initEditor('')
       this.resetDirty()
       this.suppressDirty = false
     }, 100)
@@ -425,21 +392,39 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
   /** 編集画面でカスタム項目をフィールドグループ単位のセクションに分けて返す。
    *  title / body は本文・タイトル欄で扱うため除外する。 */
   fieldSections(): Array<{ label: string; fields: FieldDefinition[] }> {
-    const type = this.currentType
-    if (!type) return []
+    // タイトル・本文・サムネイル・カテゴリ・タグ等は専用UIで扱うためカスタム欄からは除外
+    const DEFAULT_KEYS = [
+      'title',
+      'body',
+      'image',
+      'category',
+      'tags',
+      'slug',
+      'publishedAt',
+      'status',
+      'description',
+    ]
     const omit = (fields: FieldDefinition[]) =>
-      (fields || []).filter((f) => f.key !== 'title' && f.key !== 'body')
+      (fields || []).filter((f) => !DEFAULT_KEYS.includes(f.key))
     const sections: Array<{ label: string; fields: FieldDefinition[] }> = []
-    const ids = type.fieldGroupIds || []
-    if (ids.length) {
-      for (const id of ids) {
-        const g = this.fieldGroups.find((x) => x.id === id)
-        const fields = omit(g?.fields || [])
-        if (fields.length) sections.push({ label: g?.label || '', fields })
+    if (this.currentType) {
+      // 投稿タイプ: 表示条件＋後方互換のグループ。無ければ inline fields。
+      const groups = this.fieldGroupsForType(this.currentType)
+      if (groups.length) {
+        for (const g of groups) {
+          const fields = omit(g.fields)
+          if (fields.length) sections.push({ label: g.label, fields })
+        }
+      } else if (this.currentType.fields?.length) {
+        const fields = omit(this.currentType.fields)
+        if (fields.length) sections.push({ label: '', fields })
       }
-    } else if (type.fields?.length) {
-      const fields = omit(type.fields)
-      if (fields.length) sections.push({ label: '', fields })
+    } else if (this.currentPage) {
+      // 固定ページ: 表示条件が一致するフィールドグループ
+      for (const g of this.fieldGroupsForContext('page', this.currentPage.id)) {
+        const fields = omit(g.fields)
+        if (fields.length) sections.push({ label: g.label, fields })
+      }
     }
     return sections
   },

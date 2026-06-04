@@ -453,408 +453,449 @@
                       class="gh-title-input"
                     />
 
-                    <!-- 本文エディタ（hasBody が true のとき） -->
-                    <template x-if="pagesConfig?.hasBody !== false">
-                      <div id="editorjs" class="gh-editorjs"></div>
-                    </template>
+                    <!-- 本文エディタ（全ページ共通の既定項目） -->
+                    <div id="editorjs" class="gh-editorjs"></div>
 
-                    <!-- カスタムフィールド -->
-                    <template
-                      x-for="field in currentFields.filter(f => f.key !== 'title' && f.key !== 'body')"
-                      :key="field.key"
-                    >
-                      <div>
-                        <template
-                          x-if="!field.showIf || editData[field.showIf.field] === field.showIf.value"
-                        >
-                          <div
-                            class="mb-5"
-                            :class="['image','imagelist','file'].includes(field.type) ? 'bg-[var(--ds-bg-muted)] -mx-4 px-4 py-3 rounded-lg border border-[var(--ds-border-default)]' : ''"
-                          >
-                            <label class="gh-label">
-                              <span x-text="field.label"></span>
-                              <span x-show="field.required" class="text-[var(--ds-danger-600)]">
-                                *
-                              </span>
-                            </label>
-                            <p
-                              x-show="field.description"
-                              class="text-xs text-[var(--ds-text-muted)] -mt-1 mb-2"
-                              x-text="field.description"
-                            ></p>
-                            <template x-if="field.type === 'text'">
-                              <input
-                                type="text"
-                                x-model="editData[field.key]"
-                                class="gh-input-light w-full"
-                              />
-                            </template>
-                            <template x-if="field.type === 'textarea'">
-                              <textarea
-                                x-model="editData[field.key]"
-                                rows="4"
-                                class="gh-input-light w-full"
-                              ></textarea>
-                            </template>
-                            <template x-if="field.type === 'number'">
-                              <input
-                                type="number"
-                                x-model="editData[field.key]"
-                                class="gh-input-light w-full"
-                              />
-                            </template>
-                            <template x-if="field.type === 'url'">
-                              <input
-                                type="url"
-                                x-model="editData[field.key]"
-                                placeholder="https://"
-                                class="gh-input-light w-full"
-                              />
-                            </template>
-                            <template x-if="field.type === 'email'">
-                              <input
-                                type="email"
-                                x-model="editData[field.key]"
-                                class="gh-input-light w-full"
-                              />
-                            </template>
-                            <template x-if="field.type === 'date'">
-                              <input
-                                type="date"
-                                x-model="editData[field.key]"
-                                class="gh-input-light"
-                              />
-                            </template>
-                            <template x-if="field.type === 'datetime'">
-                              <input
-                                type="datetime-local"
-                                x-model="editData[field.key]"
-                                class="gh-input-light"
-                              />
-                            </template>
-                            <template x-if="field.type === 'select'">
-                              <select x-model="editData[field.key]" class="gh-select-light">
-                                <option value="">選択...</option>
-                                <template
-                                  x-for="opt in (field.options || [])"
-                                  :key="opt.value || opt"
-                                >
-                                  <option
-                                    :value="opt.value || opt"
-                                    x-text="opt.label || opt"
-                                  ></option>
-                                </template>
-                              </select>
-                            </template>
-                            <template x-if="field.type === 'checkbox' || field.type === 'toggle'">
-                              <label class="flex items-center gap-2 cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  x-model="editData[field.key]"
-                                  class="w-4 h-4 rounded border-[var(--ds-border-strong)] accent-[var(--ds-primary-600)]"
-                                />
-                                <span
-                                  class="text-sm"
-                                  x-text="editData[field.key] ? 'ON' : 'OFF'"
-                                ></span>
-                              </label>
-                            </template>
-                            <template x-if="field.type === 'image'">
-                              <div>
-                                <template x-if="editData[field.key]">
-                                  <img
-                                    :src="editData[field.key]"
-                                    class="max-h-40 rounded border border-[var(--ds-border-default)] mb-2"
-                                  />
-                                </template>
-                                <label class="ds-file-button">
-                                  <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-                                  <span
-                                    x-text="editData[field.key] ? '画像を変更' : '画像を選択'"
-                                  ></span>
-                                  <input
-                                    type="file"
-                                    accept="image/*"
-                                    @change="handleImageUpload($event, field.key)"
-                                  />
+                    <template x-for="section in fieldSections()" :key="section.label">
+                      <div class="mb-6">
+                        <template x-if="section.label">
+                          <h3
+                            class="text-sm font-bold text-[var(--ds-text-heading)] border-b border-[var(--ds-border-default)] pb-1.5 mb-4"
+                            x-text="section.label"
+                          ></h3>
+                        </template>
+                        <template x-for="field in section.fields" :key="field.key">
+                          <div>
+                            <template
+                              x-if="!field.showIf || editData[field.showIf.field] === field.showIf.value"
+                            >
+                              <div
+                                class="mb-5"
+                                :class="['image','imagelist','file'].includes(field.type) ? 'bg-[var(--ds-bg-muted)] -mx-4 px-4 py-3 rounded-lg border border-[var(--ds-border-default)]' : ''"
+                              >
+                                <label class="gh-label">
+                                  <span x-text="field.label"></span>
+                                  <span x-show="field.required" class="text-[var(--ds-danger-600)]">
+                                    *
+                                  </span>
                                 </label>
-                              </div>
-                            </template>
-                            <template x-if="field.type === 'file'">
-                              <div>
-                                <template x-if="editData[field.key]">
-                                  <p
-                                    class="text-xs text-[var(--ds-text-muted)] mb-1"
-                                    x-text="editData[field.key]"
-                                  ></p>
-                                </template>
-                                <label class="ds-file-button">
-                                  <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-                                  <span
-                                    x-text="editData[field.key] ? 'ファイルを変更' : 'ファイルを選択'"
-                                  ></span>
-                                  <input
-                                    type="file"
-                                    @change="handleFileUpload($event, field.key)"
-                                  />
-                                </label>
-                              </div>
-                            </template>
-                            <template x-if="field.type === 'color'">
-                              <input
-                                type="color"
-                                x-model="editData[field.key]"
-                                class="w-10 h-8 rounded border border-[var(--ds-border-default)] cursor-pointer"
-                              />
-                            </template>
-                            <template x-if="field.type === 'radio'">
-                              <div class="flex flex-col gap-1.5">
-                                <template
-                                  x-for="opt in (field.options || [])"
-                                  :key="opt.value || opt"
-                                >
-                                  <label class="flex items-center gap-2 cursor-pointer text-sm">
-                                    <input
-                                      type="radio"
-                                      :name="field.key"
-                                      :value="opt.value || opt"
-                                      x-model="editData[field.key]"
-                                      class="accent-[var(--ds-primary-600)]"
-                                    />
-                                    <span x-text="opt.label || opt"></span>
-                                  </label>
-                                </template>
-                              </div>
-                            </template>
-                            <template x-if="field.type === 'multiselect'">
-                              <div class="flex flex-wrap gap-2">
-                                <template
-                                  x-for="opt in (field.options || [])"
-                                  :key="opt.value || opt"
-                                >
-                                  <label
-                                    class="flex items-center gap-1.5 px-2 py-1 border border-[var(--ds-border-default)] rounded text-xs cursor-pointer"
-                                    :class="(editData[field.key]||[]).includes(opt.value||opt) ? 'bg-[var(--ds-primary-600)]/10 border-[var(--ds-primary-600)]' : ''"
-                                  >
-                                    <input
-                                      type="checkbox"
-                                      :value="opt.value || opt"
-                                      x-model="editData[field.key]"
-                                      class="hidden"
-                                    />
-                                    <span x-text="opt.label || opt"></span>
-                                  </label>
-                                </template>
-                              </div>
-                            </template>
-                            <template x-if="field.type === 'daterange'">
-                              <div class="flex items-center gap-2">
-                                <input
-                                  type="date"
-                                  x-model="editData[field.key + '_from']"
-                                  class="gh-input-light"
-                                />
-                                <span class="text-[var(--ds-text-muted)] text-sm">〜</span>
-                                <input
-                                  type="date"
-                                  x-model="editData[field.key + '_to']"
-                                  class="gh-input-light"
-                                />
-                              </div>
-                            </template>
-                            <template x-if="field.type === 'year'">
-                              <input
-                                type="number"
-                                x-model="editData[field.key]"
-                                min="1900"
-                                max="2100"
-                                placeholder="2025"
-                                class="gh-input-light w-32"
-                              />
-                            </template>
-                            <template x-if="field.type === 'hidden'">
-                              <input type="hidden" x-model="editData[field.key]" />
-                            </template>
-                            <template x-if="field.type === 'imagelist'">
-                              <div>
-                                <div class="flex flex-wrap gap-2 mb-2">
-                                  <template
-                                    x-for="(img, idx) in (editData[field.key] || [])"
-                                    :key="idx"
-                                  >
-                                    <div class="relative">
-                                      <img
-                                        :src="img"
-                                        class="w-20 h-20 object-cover rounded border border-[var(--ds-border-default)]"
-                                      />
-                                      <button
-                                        @click="editData[field.key].splice(idx,1)"
-                                        class="absolute -top-1 -right-1 w-4 h-4 bg-[var(--ds-danger-600)] text-white rounded-full text-[10px] flex items-center justify-center"
-                                      >
-                                        x
-                                      </button>
-                                    </div>
-                                  </template>
-                                </div>
-                                <label class="ds-file-button">
-                                  <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-                                  <span>画像を追加</span>
-                                  <input
-                                    type="file"
-                                    accept="image/*"
-                                    multiple
-                                    @change="for(const f of $event.target.files){handleImageUpload({target:{files:[f]}}, '__tmp');editData[field.key]=[...(editData[field.key]||[]),editData.__tmp];delete editData.__tmp}"
-                                  />
-                                </label>
-                              </div>
-                            </template>
-                            <template x-if="field.type === 'repeater'">
-                              <div class="space-y-2">
-                                <template x-if="field.subFields && field.subFields.length">
-                                  <div class="space-y-2">
-                                    <template
-                                      x-for="(row, idx) in (editData[field.key] || [])"
-                                      :key="idx"
-                                    >
-                                      <div
-                                        class="border border-[var(--ds-border-default)] rounded p-3 space-y-2 relative"
-                                      >
-                                        <button
-                                          @click="editData[field.key].splice(idx,1)"
-                                          class="absolute top-1 right-1 text-[var(--ds-danger-600)] text-xs px-1 hover:bg-red-50 rounded"
-                                        >
-                                          &times;
-                                        </button>
-                                        <template x-for="sf in field.subFields" :key="sf.key">
-                                          <div>
-                                            <label
-                                              class="text-xs text-[var(--ds-text-muted)]"
-                                              x-text="sf.label"
-                                            ></label>
-                                            <template x-if="sf.type === 'textarea'">
-                                              <textarea
-                                                x-model="editData[field.key][idx][sf.key]"
-                                                rows="2"
-                                                class="gh-input-light w-full text-sm"
-                                              ></textarea>
-                                            </template>
-                                            <template x-if="sf.type === 'image'">
-                                              <div>
-                                                <template x-if="editData[field.key][idx][sf.key]">
-                                                  <img
-                                                    :src="editData[field.key][idx][sf.key]"
-                                                    class="max-h-20 rounded border border-[var(--ds-border-default)] mb-1"
-                                                  />
-                                                </template>
-                                                <label class="ds-file-button">
-                                                  <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-                                                  <span
-                                                    x-text="editData[field.key][idx][sf.key] ? '画像を変更' : '画像を選択'"
-                                                  ></span>
-                                                  <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    @change="handleImageUpload($event, '__tmp').then(() => { editData[field.key][idx][sf.key] = editData.__tmp; delete editData.__tmp })"
-                                                  />
-                                                </label>
-                                              </div>
-                                            </template>
-                                            <template
-                                              x-if="!['textarea','image'].includes(sf.type)"
-                                            >
-                                              <input
-                                                :type="sf.type === 'number' ? 'number' : sf.type === 'url' ? 'url' : sf.type === 'email' ? 'email' : sf.type === 'date' ? 'date' : 'text'"
-                                                x-model="editData[field.key][idx][sf.key]"
-                                                class="gh-input-light w-full text-sm"
-                                              />
-                                            </template>
-                                          </div>
-                                        </template>
-                                      </div>
-                                    </template>
-                                    <button
-                                      @click="const empty = {}; field.subFields.forEach(sf => empty[sf.key] = ''); editData[field.key] = [...(editData[field.key]||[]), empty]"
-                                      class="gh-btn-outline text-xs"
-                                    >
-                                      + 追加
-                                    </button>
-                                  </div>
-                                </template>
-                                <template x-if="!field.subFields || !field.subFields.length">
-                                  <div class="space-y-2">
-                                    <template
-                                      x-for="(row, idx) in (editData[field.key] || [])"
-                                      :key="idx"
-                                    >
-                                      <div class="flex gap-2 items-center">
-                                        <input
-                                          type="text"
-                                          x-model="editData[field.key][idx]"
-                                          class="gh-input-light flex-1"
-                                        />
-                                        <button
-                                          @click="editData[field.key].splice(idx,1)"
-                                          class="text-[var(--ds-danger-600)] text-xs"
-                                        >
-                                          削除
-                                        </button>
-                                      </div>
-                                    </template>
-                                    <button
-                                      @click="editData[field.key] = [...(editData[field.key]||[]), '']"
-                                      class="gh-btn-outline text-xs"
-                                    >
-                                      + 追加
-                                    </button>
-                                  </div>
-                                </template>
-                              </div>
-                            </template>
-                            <template x-if="field.type === 'relation'">
-                              <div>
-                                <template x-if="field.relationType">
-                                  <div
-                                    class="space-y-1 max-h-60 overflow-y-auto border border-[var(--ds-border-default)] rounded p-2"
-                                  >
-                                    <template
-                                      x-for="item in relationCandidates(field.relationType)"
-                                      :key="item.id"
-                                    >
-                                      <label
-                                        class="flex items-center gap-2 text-sm py-1 px-2 rounded hover:bg-[var(--ds-bg-hover)] cursor-pointer"
-                                      >
-                                        <input
-                                          type="checkbox"
-                                          :value="item.id"
-                                          x-model="editData[field.key]"
-                                          class="accent-[var(--ds-primary-600)]"
-                                        />
-                                        <span
-                                          class="flex-1 truncate"
-                                          x-text="item.title || item.id"
-                                        ></span>
-                                        <span
-                                          class="text-[10px] text-[var(--ds-text-muted)]"
-                                          x-text="item.publishedAt || ''"
-                                        ></span>
-                                      </label>
-                                    </template>
-                                    <template x-if="!relationCandidates(field.relationType).length">
-                                      <p
-                                        class="text-xs text-[var(--ds-text-muted)] py-2 text-center"
-                                      >
-                                        該当するコンテンツがありません
-                                      </p>
-                                    </template>
-                                  </div>
-                                </template>
-                                <template x-if="!field.relationType">
+                                <p
+                                  x-show="field.description"
+                                  class="text-xs text-[var(--ds-text-muted)] -mt-1 mb-2"
+                                  x-text="field.description"
+                                ></p>
+                                <template x-if="field.type === 'text'">
                                   <input
                                     type="text"
                                     x-model="editData[field.key]"
-                                    placeholder="関連コンテンツID"
                                     class="gh-input-light w-full"
                                   />
+                                </template>
+                                <template x-if="field.type === 'textarea'">
+                                  <textarea
+                                    x-model="editData[field.key]"
+                                    rows="4"
+                                    class="gh-input-light w-full"
+                                  ></textarea>
+                                </template>
+                                <template x-if="field.type === 'richtext'">
+                                  <div id="editorjs" class="gh-editorjs"></div>
+                                </template>
+                                <template x-if="field.type === 'number'">
+                                  <input
+                                    type="number"
+                                    x-model="editData[field.key]"
+                                    class="gh-input-light w-full"
+                                  />
+                                </template>
+                                <template x-if="field.type === 'url'">
+                                  <input
+                                    type="url"
+                                    x-model="editData[field.key]"
+                                    placeholder="https://"
+                                    class="gh-input-light w-full"
+                                  />
+                                </template>
+                                <template x-if="field.type === 'email'">
+                                  <input
+                                    type="email"
+                                    x-model="editData[field.key]"
+                                    class="gh-input-light w-full"
+                                  />
+                                </template>
+                                <template x-if="field.type === 'date'">
+                                  <input
+                                    type="date"
+                                    x-model="editData[field.key]"
+                                    class="gh-input-light"
+                                  />
+                                </template>
+                                <template x-if="field.type === 'datetime'">
+                                  <input
+                                    type="datetime-local"
+                                    x-model="editData[field.key]"
+                                    class="gh-input-light"
+                                  />
+                                </template>
+                                <template x-if="field.type === 'select'">
+                                  <select x-model="editData[field.key]" class="gh-select-light">
+                                    <option value="">選択...</option>
+                                    <template
+                                      x-for="opt in (field.options || [])"
+                                      :key="opt.value || opt"
+                                    >
+                                      <option
+                                        :value="opt.value || opt"
+                                        x-text="opt.label || opt"
+                                      ></option>
+                                    </template>
+                                  </select>
+                                </template>
+                                <template
+                                  x-if="field.type === 'checkbox' || field.type === 'toggle'"
+                                >
+                                  <label class="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                      type="checkbox"
+                                      x-model="editData[field.key]"
+                                      class="w-4 h-4 rounded border-[var(--ds-border-strong)] accent-[var(--ds-primary-600)]"
+                                    />
+                                    <span
+                                      class="text-sm"
+                                      x-text="editData[field.key] ? 'ON' : 'OFF'"
+                                    ></span>
+                                  </label>
+                                </template>
+                                <template x-if="field.type === 'image'">
+                                  <div>
+                                    <template x-if="editData[field.key]">
+                                      <img
+                                        :src="editData[field.key]"
+                                        class="max-h-40 rounded border border-[var(--ds-border-default)] mb-2"
+                                      />
+                                    </template>
+                                    <label class="ds-file-button">
+                                      <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                                      <span
+                                        x-text="editData[field.key] ? '画像を変更' : '画像を選択'"
+                                      ></span>
+                                      <input
+                                        type="file"
+                                        accept="image/*"
+                                        @change="handleImageUpload($event, field.key)"
+                                      />
+                                    </label>
+                                  </div>
+                                </template>
+                                <template x-if="field.type === 'file'">
+                                  <div>
+                                    <template x-if="editData[field.key]">
+                                      <p
+                                        class="text-xs text-[var(--ds-text-muted)] mb-1"
+                                        x-text="editData[field.key]"
+                                      ></p>
+                                    </template>
+                                    <label class="ds-file-button">
+                                      <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                                      <span
+                                        x-text="editData[field.key] ? 'ファイルを変更' : 'ファイルを選択'"
+                                      ></span>
+                                      <input
+                                        type="file"
+                                        @change="handleFileUpload($event, field.key)"
+                                      />
+                                    </label>
+                                  </div>
+                                </template>
+                                <template x-if="field.type === 'color'">
+                                  <input
+                                    type="color"
+                                    x-model="editData[field.key]"
+                                    class="w-10 h-8 rounded border border-[var(--ds-border-default)] cursor-pointer"
+                                  />
+                                </template>
+                                <!-- radio -->
+                                <template x-if="field.type === 'radio'">
+                                  <div class="flex flex-col gap-1.5">
+                                    <template
+                                      x-for="opt in (field.options || [])"
+                                      :key="opt.value || opt"
+                                    >
+                                      <label class="flex items-center gap-2 cursor-pointer text-sm">
+                                        <input
+                                          type="radio"
+                                          :name="field.key"
+                                          :value="opt.value || opt"
+                                          x-model="editData[field.key]"
+                                          class="accent-[var(--ds-primary-600)]"
+                                        />
+                                        <span x-text="opt.label || opt"></span>
+                                      </label>
+                                    </template>
+                                  </div>
+                                </template>
+                                <!-- multiselect -->
+                                <template x-if="field.type === 'multiselect'">
+                                  <div class="flex flex-wrap gap-2">
+                                    <template
+                                      x-for="opt in (field.options || [])"
+                                      :key="opt.value || opt"
+                                    >
+                                      <label
+                                        class="flex items-center gap-1.5 px-2 py-1 border border-[var(--ds-border-default)] rounded text-xs cursor-pointer"
+                                        :class="(editData[field.key]||[]).includes(opt.value||opt) ? 'bg-[var(--ds-primary-600)]/10 border-[var(--ds-primary-600)]' : ''"
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          :value="opt.value || opt"
+                                          x-model="editData[field.key]"
+                                          class="hidden"
+                                        />
+                                        <span x-text="opt.label || opt"></span>
+                                      </label>
+                                    </template>
+                                  </div>
+                                </template>
+                                <!-- daterange -->
+                                <template x-if="field.type === 'daterange'">
+                                  <div class="flex items-center gap-2">
+                                    <input
+                                      type="date"
+                                      x-model="editData[field.key + '_from']"
+                                      class="gh-input-light"
+                                    />
+                                    <span class="text-[var(--ds-text-muted)] text-sm">〜</span>
+                                    <input
+                                      type="date"
+                                      x-model="editData[field.key + '_to']"
+                                      class="gh-input-light"
+                                    />
+                                  </div>
+                                </template>
+                                <!-- year -->
+                                <template x-if="field.type === 'year'">
+                                  <input
+                                    type="number"
+                                    x-model="editData[field.key]"
+                                    min="1900"
+                                    max="2100"
+                                    placeholder="2025"
+                                    class="gh-input-light w-32"
+                                  />
+                                </template>
+                                <!-- hidden -->
+                                <template x-if="field.type === 'hidden'">
+                                  <input type="hidden" x-model="editData[field.key]" />
+                                </template>
+                                <!-- imagelist -->
+                                <template x-if="field.type === 'imagelist'">
+                                  <div>
+                                    <div class="flex flex-wrap gap-2 mb-2">
+                                      <template
+                                        x-for="(img, idx) in (editData[field.key] || [])"
+                                        :key="idx"
+                                      >
+                                        <div class="relative">
+                                          <img
+                                            :src="img"
+                                            class="w-20 h-20 object-cover rounded border border-[var(--ds-border-default)]"
+                                          />
+                                          <button
+                                            @click="editData[field.key].splice(idx,1)"
+                                            class="absolute -top-1 -right-1 w-4 h-4 bg-[var(--ds-danger-600)] text-white rounded-full text-[10px] flex items-center justify-center"
+                                          >
+                                            x
+                                          </button>
+                                        </div>
+                                      </template>
+                                    </div>
+                                    <label class="ds-file-button">
+                                      <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                                      <span>画像を追加</span>
+                                      <input
+                                        type="file"
+                                        accept="image/*"
+                                        multiple
+                                        @change="for(const f of $event.target.files){handleImageUpload({target:{files:[f]}}, '__tmp');editData[field.key]=[...(editData[field.key]||[]),editData.__tmp];delete editData.__tmp}"
+                                      />
+                                    </label>
+                                  </div>
+                                </template>
+                                <!-- repeater -->
+                                <template x-if="field.type === 'repeater'">
+                                  <div class="space-y-2">
+                                    <!-- サブフィールドありの場合 -->
+                                    <template x-if="field.subFields && field.subFields.length">
+                                      <div class="space-y-2">
+                                        <template
+                                          x-for="(row, idx) in (editData[field.key] || [])"
+                                          :key="idx"
+                                        >
+                                          <div
+                                            class="border border-[var(--ds-border-default)] rounded p-3 space-y-2 relative"
+                                          >
+                                            <button
+                                              @click="editData[field.key].splice(idx,1)"
+                                              class="absolute top-1 right-1 text-[var(--ds-danger-600)] text-xs px-1 hover:bg-red-50 rounded"
+                                            >
+                                              &times;
+                                            </button>
+                                            <template x-for="sf in field.subFields" :key="sf.key">
+                                              <div>
+                                                <label
+                                                  class="text-xs text-[var(--ds-text-muted)]"
+                                                  x-text="sf.label"
+                                                ></label>
+                                                <template x-if="sf.type === 'textarea'">
+                                                  <textarea
+                                                    x-model="editData[field.key][idx][sf.key]"
+                                                    rows="2"
+                                                    class="gh-input-light w-full text-sm"
+                                                  ></textarea>
+                                                </template>
+                                                <template x-if="sf.type === 'image'">
+                                                  <div>
+                                                    <template
+                                                      x-if="editData[field.key][idx][sf.key]"
+                                                    >
+                                                      <img
+                                                        :src="editData[field.key][idx][sf.key]"
+                                                        class="max-h-20 rounded border border-[var(--ds-border-default)] mb-1"
+                                                      />
+                                                    </template>
+                                                    <label class="ds-file-button">
+                                                      <i
+                                                        data-lucide="upload"
+                                                        class="w-3.5 h-3.5"
+                                                      ></i>
+                                                      <span
+                                                        x-text="editData[field.key][idx][sf.key] ? '画像を変更' : '画像を選択'"
+                                                      ></span>
+                                                      <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        @change="handleImageUpload($event, '__tmp').then(() => { editData[field.key][idx][sf.key] = editData.__tmp; delete editData.__tmp })"
+                                                      />
+                                                    </label>
+                                                  </div>
+                                                </template>
+                                                <template
+                                                  x-if="!['textarea','image'].includes(sf.type)"
+                                                >
+                                                  <input
+                                                    :type="sf.type === 'number' ? 'number' : sf.type === 'url' ? 'url' : sf.type === 'email' ? 'email' : sf.type === 'date' ? 'date' : 'text'"
+                                                    x-model="editData[field.key][idx][sf.key]"
+                                                    class="gh-input-light w-full text-sm"
+                                                  />
+                                                </template>
+                                              </div>
+                                            </template>
+                                          </div>
+                                        </template>
+                                        <button
+                                          @click="const empty = {}; field.subFields.forEach(sf => empty[sf.key] = ''); editData[field.key] = [...(editData[field.key]||[]), empty]"
+                                          class="gh-btn-outline text-xs"
+                                        >
+                                          + 追加
+                                        </button>
+                                      </div>
+                                    </template>
+                                    <!-- サブフィールドなし（従来の文字列リスト） -->
+                                    <template x-if="!field.subFields || !field.subFields.length">
+                                      <div class="space-y-2">
+                                        <template
+                                          x-for="(row, idx) in (editData[field.key] || [])"
+                                          :key="idx"
+                                        >
+                                          <div class="flex gap-2 items-center">
+                                            <input
+                                              type="text"
+                                              x-model="editData[field.key][idx]"
+                                              class="gh-input-light flex-1"
+                                            />
+                                            <button
+                                              @click="editData[field.key].splice(idx,1)"
+                                              class="text-[var(--ds-danger-600)] text-xs"
+                                            >
+                                              削除
+                                            </button>
+                                          </div>
+                                        </template>
+                                        <button
+                                          @click="editData[field.key] = [...(editData[field.key]||[]), '']"
+                                          class="gh-btn-outline text-xs"
+                                        >
+                                          + 追加
+                                        </button>
+                                      </div>
+                                    </template>
+                                  </div>
+                                </template>
+                                <!-- group -->
+                                <template x-if="field.type === 'group'">
+                                  <details
+                                    class="border border-[var(--ds-border-default)] rounded-md"
+                                    open
+                                  >
+                                    <summary
+                                      class="px-3 py-2 text-sm font-medium cursor-pointer bg-[var(--ds-bg-muted)]"
+                                      x-text="field.label"
+                                    ></summary>
+                                    <div class="p-3 text-xs text-[var(--ds-text-muted)]">
+                                      グループフィールドはJSONで直接編集してください
+                                    </div>
+                                  </details>
+                                </template>
+                                <!-- relation -->
+                                <template x-if="field.type === 'relation'">
+                                  <div>
+                                    <template x-if="field.relationType">
+                                      <div
+                                        class="space-y-1 max-h-60 overflow-y-auto border border-[var(--ds-border-default)] rounded p-2"
+                                      >
+                                        <template
+                                          x-for="item in relationCandidates(field.relationType)"
+                                          :key="item.id"
+                                        >
+                                          <label
+                                            class="flex items-center gap-2 text-sm py-1 px-2 rounded hover:bg-[var(--ds-bg-hover)] cursor-pointer"
+                                          >
+                                            <input
+                                              type="checkbox"
+                                              :value="item.id"
+                                              x-model="editData[field.key]"
+                                              class="accent-[var(--ds-primary-600)]"
+                                            />
+                                            <span
+                                              class="flex-1 truncate"
+                                              x-text="item.title || item.id"
+                                            ></span>
+                                            <span
+                                              class="text-[10px] text-[var(--ds-text-muted)]"
+                                              x-text="item.publishedAt || ''"
+                                            ></span>
+                                          </label>
+                                        </template>
+                                        <template
+                                          x-if="!relationCandidates(field.relationType).length"
+                                        >
+                                          <p
+                                            class="text-xs text-[var(--ds-text-muted)] py-2 text-center"
+                                          >
+                                            該当するコンテンツがありません
+                                          </p>
+                                        </template>
+                                      </div>
+                                    </template>
+                                    <template x-if="!field.relationType">
+                                      <input
+                                        type="text"
+                                        x-model="editData[field.key]"
+                                        placeholder="関連コンテンツID"
+                                        class="gh-input-light w-full"
+                                      />
+                                    </template>
+                                  </div>
                                 </template>
                               </div>
                             </template>
@@ -962,6 +1003,57 @@
                     </div>
                   </template>
 
+                  <!-- サムネイル（全ページ共通の既定項目） -->
+                  <div>
+                    <label class="gh-label">サムネイル</label>
+                    <img
+                      x-show="editData.image"
+                      :src="editData.image"
+                      class="w-full aspect-video object-cover rounded border border-[var(--ds-border-default)] mb-2"
+                    />
+                    <label class="ds-file-button w-full justify-center">
+                      <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                      <span
+                        x-text="editData.image ? 'サムネイルを変更' : 'サムネイルを選択'"
+                      ></span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        @change="handleImageUpload($event, 'image')"
+                      />
+                    </label>
+                  </div>
+
+                  <!-- カテゴリ（全ページ共通の既定項目） -->
+                  <div x-show="availableCategories.length">
+                    <label class="gh-label">カテゴリ</label>
+                    <select
+                      x-model="editData.category"
+                      x-effect="$nextTick(() => { if ($el.value !== (editData.category || '')) $el.value = editData.category || '' })"
+                      class="gh-select-light text-xs w-full"
+                    >
+                      <option value="">未分類</option>
+                      <template x-for="cat in availableCategories" :key="cat.id">
+                        <option :value="cat.label" x-text="cat.label"></option>
+                      </template>
+                    </select>
+                  </div>
+
+                  <!-- タグ（全ページ共通の既定項目） -->
+                  <div x-show="availableTags.length">
+                    <label class="gh-label">タグ</label>
+                    <div class="flex flex-wrap gap-1">
+                      <template x-for="tag in availableTags" :key="tag.id">
+                        <button
+                          @click="editData.tags = editData.tags || []; editData.tags.includes(tag.label) ? editData.tags = editData.tags.filter(t => t !== tag.label) : editData.tags.push(tag.label)"
+                          class="px-2 py-0.5 rounded border text-[11px] transition-all"
+                          :class="(editData.tags||[]).includes(tag.label) ? 'bg-[var(--ds-primary-600)]/10 border-[var(--ds-primary-600)] text-[var(--ds-primary-600)]' : 'border-[var(--ds-border-default)] text-[var(--ds-text-muted)] hover:border-[var(--ds-border-strong)]'"
+                          x-text="tag.label"
+                        ></button>
+                      </template>
+                    </div>
+                  </div>
+
                   <!-- ページ別カスタムスクリプト -->
                   <template x-if="true">
                     <div>
@@ -999,13 +1091,6 @@
                 <div class="px-8 py-0">
                   <div class="gh-editor-header">
                     <h2 class="text-sm font-bold">ページ</h2>
-                    <button
-                      @click="openPagesConfigEditor()"
-                      class="gh-btn-outline text-xs ml-2"
-                      title="ページ設定"
-                    >
-                      <i data-lucide="settings" class="w-3 h-3"></i>
-                    </button>
                     <div class="flex-1"></div>
                     <button @click="createPage()" class="gh-btn-green text-[13px]">
                       <i data-lucide="plus" class="w-3.5 h-3.5"></i>
@@ -1168,12 +1253,10 @@
                       class="gh-title-input"
                     />
 
-                    <!-- 本文（hasBodyがtrueの時のみ表示） -->
-                    <template x-if="currentType?.hasBody">
-                      <div class="mb-6">
-                        <div id="editorjs" class="gh-editorjs"></div>
-                      </div>
-                    </template>
+                    <!-- 本文（全タイプ共通の既定項目） -->
+                    <div class="mb-6">
+                      <div id="editorjs" class="gh-editorjs"></div>
+                    </div>
 
                     <template x-for="section in fieldSections()" :key="section.label">
                       <div class="mb-6">
@@ -1666,8 +1749,8 @@
                     ></p>
                   </div>
 
-                  <!-- サムネイル -->
-                  <template x-if="currentType?.hasThumbnail">
+                  <!-- サムネイル（全タイプ共通の既定項目） -->
+                  <template x-if="true">
                     <div>
                       <label class="gh-label">サムネイル</label>
                       <img
@@ -1689,8 +1772,8 @@
                     </div>
                   </template>
 
-                  <!-- カテゴリ -->
-                  <div x-show="currentType?.hasCategory && availableCategories.length">
+                  <!-- カテゴリ（全タイプ共通の既定項目） -->
+                  <div x-show="availableCategories.length">
                     <label class="gh-label">カテゴリ</label>
                     <select
                       x-model="editData.category"
@@ -1704,8 +1787,8 @@
                     </select>
                   </div>
 
-                  <!-- タグ -->
-                  <div x-show="currentType?.hasTag && availableTags.length">
+                  <!-- タグ（全タイプ共通の既定項目） -->
+                  <div x-show="availableTags.length">
                     <label class="gh-label">タグ</label>
                     <div class="flex flex-wrap gap-1">
                       <template x-for="tag in availableTags" :key="tag.id">
@@ -2300,6 +2383,75 @@
                               placeholder="自動"
                             />
                           </div>
+                        </div>
+
+                        <!-- 表示条件（ロケーションルール） -->
+                        <div>
+                          <h3 class="text-sm font-bold mb-1">表示条件</h3>
+                          <p class="text-xs text-[var(--ds-text-muted)] mb-2">
+                            このグループを表示する編集画面を指定します。いずれかの条件に一致する固定ページ・投稿の編集画面に入力項目が表示されます。
+                          </p>
+                          <div class="space-y-2">
+                            <template
+                              x-for="(loc, li) in (currentFieldGroup.locations || [])"
+                              :key="li"
+                            >
+                              <div class="flex items-center gap-2">
+                                <select
+                                  class="gh-select-light text-xs flex-1"
+                                  @change="currentFieldGroup.locations[li] = parseLocationOption($event.target.value)"
+                                >
+                                  <option
+                                    value="page:*"
+                                    :selected="loc.target === 'page' && loc.value === '*'"
+                                  >
+                                    すべての固定ページ
+                                  </option>
+                                  <template x-for="p in pages" :key="'pg-' + p.id">
+                                    <option
+                                      :value="'page:' + p.id"
+                                      :selected="loc.target === 'page' && loc.value === p.id"
+                                      x-text="'固定ページ: ' + (p.title || p.id)"
+                                    ></option>
+                                  </template>
+                                  <option
+                                    value="contentType:*"
+                                    :selected="loc.target === 'contentType' && loc.value === '*'"
+                                  >
+                                    すべての投稿タイプ
+                                  </option>
+                                  <template x-for="t in contentTypes" :key="'ct-' + t.id">
+                                    <option
+                                      :value="'contentType:' + t.id"
+                                      :selected="loc.target === 'contentType' && loc.value === t.id"
+                                      x-text="'投稿タイプ: ' + t.label"
+                                    ></option>
+                                  </template>
+                                </select>
+                                <button
+                                  type="button"
+                                  @click="currentFieldGroup.locations.splice(li, 1)"
+                                  class="text-[var(--ds-danger-600)] text-xs hover:underline shrink-0"
+                                >
+                                  削除
+                                </button>
+                              </div>
+                            </template>
+                          </div>
+                          <button
+                            type="button"
+                            @click="addLocationRule()"
+                            class="gh-btn-outline text-xs mt-2"
+                          >
+                            <i data-lucide="plus" class="w-3 h-3"></i>
+                            条件を追加
+                          </button>
+                          <p
+                            x-show="!(currentFieldGroup.locations || []).length"
+                            class="text-[11px] text-[var(--ds-text-muted)] mt-1"
+                          >
+                            条件が未設定の場合、このグループはどの編集画面にも表示されません。
+                          </p>
                         </div>
 
                         <!-- フィールド定義 -->
@@ -3443,80 +3595,6 @@
       </div>
     </div>
 
-    <!-- ページ設定モーダル -->
-    <template x-if="showPagesConfigEditor && editingPagesConfig">
-      <div
-        class="fixed inset-0 bg-[var(--ds-bg-overlay)] flex items-center justify-center z-50"
-        @click.self="showPagesConfigEditor=false; editingPagesConfig=null"
-      >
-        <div
-          class="bg-[var(--ds-bg-surface)] rounded-lg shadow-xl w-full max-w-lg max-h-[80vh] overflow-y-auto p-6 text-[var(--ds-text-heading)]"
-        >
-          <h2 class="text-lg font-bold mb-4">ページ設定</h2>
-          <div class="space-y-4">
-            <div>
-              <label class="flex items-center gap-1.5 text-xs cursor-pointer">
-                <input
-                  type="checkbox"
-                  x-model="editingPagesConfig.hasBody"
-                  class="accent-[var(--ds-primary-600)]"
-                />
-                本文エディタを表示
-              </label>
-              <p class="text-[10px] text-[var(--ds-text-muted)] mt-0.5 ml-6">
-                すべてのページでEditor.jsの本文エディタを有効にします
-              </p>
-            </div>
-            <div class="h-px bg-[var(--ds-border-default)] my-2"></div>
-            <h3 class="text-sm font-bold mb-2">フィールドグループ</h3>
-            <template x-if="fieldGroups.length">
-              <div class="space-y-1">
-                <template x-for="g in fieldGroups" :key="g.id">
-                  <label
-                    class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-[var(--ds-bg-hover)] cursor-pointer text-xs"
-                  >
-                    <input
-                      type="checkbox"
-                      :value="g.id"
-                      :checked="(editingPagesConfig.fieldGroupIds || []).includes(g.id)"
-                      @change="
-                        if (!editingPagesConfig.fieldGroupIds) editingPagesConfig.fieldGroupIds = [];
-                        if ($event.target.checked) {
-                          editingPagesConfig.fieldGroupIds.push(g.id);
-                        } else {
-                          editingPagesConfig.fieldGroupIds = editingPagesConfig.fieldGroupIds.filter(id => id !== g.id);
-                        }
-                      "
-                      class="accent-[var(--ds-primary-600)]"
-                    />
-                    <span x-text="g.label"></span>
-                    <span
-                      class="text-[var(--ds-text-muted)] ml-auto"
-                      x-text="g.fields.length + ' フィールド'"
-                    ></span>
-                  </label>
-                </template>
-              </div>
-            </template>
-            <template x-if="!fieldGroups.length">
-              <p class="text-xs text-[var(--ds-text-muted)]">
-                フィールドグループがありません。サイドバーの「フィールド」から作成してください。
-              </p>
-            </template>
-          </div>
-          <div class="flex justify-end gap-2 mt-6">
-            <button
-              @click="showPagesConfigEditor=false; editingPagesConfig=null"
-              class="gh-btn-outline text-xs"
-            >
-              キャンセル
-            </button>
-            <button @click="savePagesConfig()" class="gh-btn-green text-xs">保存</button>
-          </div>
-        </div>
-      </div>
-    </template>
-
     <!-- コンテンツタイプ編集モーダル -->
     <template x-if="showTypeEditor && editingType">
       <div
@@ -3552,103 +3630,28 @@
               <label class="flex items-center gap-1.5 text-xs cursor-pointer">
                 <input
                   type="checkbox"
-                  x-model="editingType.hasBody"
-                  class="accent-[var(--ds-primary-600)]"
-                />
-                本文
-              </label>
-              <label class="flex items-center gap-1.5 text-xs cursor-pointer">
-                <input
-                  type="checkbox"
                   x-model="editingType.hasDate"
                   class="accent-[var(--ds-primary-600)]"
                 />
                 投稿日
               </label>
-              <label class="flex items-center gap-1.5 text-xs cursor-pointer">
-                <input
-                  type="checkbox"
-                  x-model="editingType.hasThumbnail"
-                  class="accent-[var(--ds-primary-600)]"
-                />
-                サムネイル
-              </label>
-              <label class="flex items-center gap-1.5 text-xs cursor-pointer">
-                <input
-                  type="checkbox"
-                  x-model="editingType.hasCategory"
-                  class="accent-[var(--ds-primary-600)]"
-                />
-                カテゴリ
-              </label>
-              <label class="flex items-center gap-1.5 text-xs cursor-pointer">
-                <input
-                  type="checkbox"
-                  x-model="editingType.hasTag"
-                  class="accent-[var(--ds-primary-600)]"
-                />
-                タグ
-              </label>
             </div>
-            <div class="h-px bg-[var(--ds-border-default)] my-2"></div>
-            <div class="flex items-center justify-between mb-1">
-              <h3 class="text-sm font-bold">フィールド（入力項目）</h3>
-              <button
-                type="button"
-                @click="goEditFieldGroup()"
-                class="text-xs text-[var(--ds-primary-600)] hover:underline flex items-center gap-1"
-              >
-                <i data-lucide="plus" class="w-3 h-3"></i>
-                新規グループ
-              </button>
-            </div>
-            <p class="text-[11px] text-[var(--ds-text-muted)] mb-2">
-              この投稿タイプで使う入力項目グループを選びます。項目の追加・編集は「編集」から行えます。
+            <p class="text-[11px] text-[var(--ds-text-muted)] -mt-1">
+              タイトル・本文・サムネイル・カテゴリ・タグは全タイプ共通で常に表示されます。
             </p>
-            <template x-if="fieldGroups.length">
-              <div class="space-y-1">
-                <template x-for="g in fieldGroups" :key="g.id">
-                  <div
-                    class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-[var(--ds-bg-hover)] text-xs"
-                  >
-                    <label class="flex items-center gap-2 cursor-pointer flex-1 min-w-0">
-                      <input
-                        type="checkbox"
-                        :value="g.id"
-                        :checked="(editingType?.fieldGroupIds || []).includes(g.id)"
-                        @change="
-                          if (!editingType.fieldGroupIds) editingType.fieldGroupIds = [];
-                          if ($event.target.checked) {
-                            editingType.fieldGroupIds.push(g.id);
-                          } else {
-                            editingType.fieldGroupIds = editingType.fieldGroupIds.filter(id => id !== g.id);
-                          }
-                        "
-                        class="accent-[var(--ds-primary-600)]"
-                      />
-                      <span class="truncate" x-text="g.label"></span>
-                      <span
-                        class="text-[var(--ds-text-muted)] shrink-0"
-                        x-text="'(' + g.fields.length + '項目)'"
-                      ></span>
-                    </label>
-                    <button
-                      type="button"
-                      @click="goEditFieldGroup(g.id)"
-                      class="text-[var(--ds-primary-600)] hover:underline shrink-0"
-                    >
-                      編集
-                    </button>
-                  </div>
-                </template>
-              </div>
-            </template>
-            <template x-if="!fieldGroups.length">
+            <div class="h-px bg-[var(--ds-border-default)] my-2"></div>
+            <div>
+              <h3 class="text-sm font-bold mb-1">入力項目（フィールドグループ）</h3>
+              <p class="text-[11px] text-[var(--ds-text-muted)] mb-2 leading-snug">
+                カスタム入力項目は「フィールド」画面でフィールドグループを作成し、各グループの
+                <strong>表示条件</strong>
+                でこの投稿タイプを指定すると、編集画面に表示されます。
+              </p>
               <button type="button" @click="goEditFieldGroup()" class="gh-btn-outline text-xs">
-                <i data-lucide="plus" class="w-3 h-3"></i>
-                最初のフィールドグループを作成
+                <i data-lucide="settings" class="w-3 h-3"></i>
+                フィールドグループを管理
               </button>
-            </template>
+            </div>
           </div>
 
           <div class="flex justify-between mt-6">

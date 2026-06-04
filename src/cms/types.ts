@@ -6,6 +6,7 @@ import {
   type ContentType,
   type FieldDefinition,
   type FieldGroup,
+  type LocationRule,
   type RevisionEntry,
   type ExportResult,
   type Menu,
@@ -141,6 +142,7 @@ export interface CmsComponent {
   showToast(message: string, duration?: number): void
   selectFolder(): Promise<void>
   loadSiteData(): Promise<void>
+  migrateTypeFieldGroupsToLocations(): Promise<void>
   ensureInitialData(): Promise<void>
   ensureMissingTemplates(): Promise<void>
   createPage(): void
@@ -150,20 +152,6 @@ export interface CmsComponent {
   editingPageId: string
   editingPageTitle: string
   loadPageList(): Promise<void>
-  // ページ設定
-  pagesConfig: {
-    hasBody?: boolean
-    fieldGroupIds?: string[]
-    overrides?: Record<string, { hasBody?: boolean; fieldGroupIds?: string[] }>
-  }
-  showPagesConfigEditor: boolean
-  editingPagesConfig: {
-    hasBody?: boolean
-    fieldGroupIds?: string[]
-    overrides?: Record<string, { hasBody?: boolean; fieldGroupIds?: string[] }>
-  } | null
-  openPagesConfigEditor(): void
-  savePagesConfig(): Promise<void>
   openPage(page: ContentData): Promise<void>
   openContentType(type: ContentType): Promise<void>
   rebuildContentList(): Promise<void>
@@ -242,6 +230,11 @@ export interface CmsComponent {
   saveFieldGroup(): Promise<void>
   deleteFieldGroup(): Promise<void>
   resolveFields(fieldGroupIds?: string[], fallbackFields?: FieldDefinition[]): FieldDefinition[]
+  fieldGroupsForContext(kind: 'page' | 'contentType', id: string): FieldGroup[]
+  fieldGroupsForType(type: ContentType): FieldGroup[]
+  fieldsForType(type: ContentType): FieldDefinition[]
+  addLocationRule(): void
+  parseLocationOption(v: string): LocationRule
   getFieldTemplateCode(type?: ContentType): string
   // フィールドタイプ選択ピッカー（非エンジニア向け）
   fieldTypes: Array<{ id: string; label: string; icon: string; desc: string; category: string }>

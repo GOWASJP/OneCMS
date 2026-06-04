@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { CmsComponent } from './types.ts'
-import { type ContentType, type FieldDefinition, type FieldGroup } from '../types.ts'
+import {
+  type ContentType,
+  type FieldDefinition,
+  type FieldGroup,
+  type LocationRule,
+} from '../types.ts'
 
 export const contentTypesMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
   /** 選択中の投稿タイプから {{page.xxx}} 形式のリファレンスを生成 */
@@ -9,7 +14,7 @@ export const contentTypesMixin: Partial<CmsComponent> & ThisType<CmsComponent> =
     if (!typeId) return []
     const type = this.contentTypes.find((t) => t.id === typeId)
     if (!type) return []
-    const fields = this.resolveFields(type.fieldGroupIds, type.fields)
+    const fields = this.fieldsForType(type)
     const result: Array<{ label: string; code: string; note?: string }> = []
 
     // タイトル・スラッグ・id は ContentData の必須要素なので常に表示
@@ -17,16 +22,12 @@ export const contentTypesMixin: Partial<CmsComponent> & ThisType<CmsComponent> =
     result.push({ label: 'スラッグ', code: '{{page.slug}}' })
     result.push({ label: 'ID', code: '{{page.id}}' })
 
-    // 本文: hasBody === true、または fieldGroups から body フィールドが見つかる場合
-    const hasBody =
-      type.hasBody === true || fields.some((f) => f.key === 'body' && f.type === 'richtext')
-    if (hasBody) {
-      result.push({
-        label: '本文 (HTML)',
-        code: '{{{page.body}}}',
-        note: '三重括弧でエスケープせず出力',
-      })
-    }
+    // 本文・カテゴリ・タグ・サムネイルは全タイプ共通の既定項目なので常に参照可能
+    result.push({
+      label: '本文 (HTML)',
+      code: '{{{page.body}}}',
+      note: '三重括弧でエスケープせず出力',
+    })
     // 公開日: hasDate === true のときのみ
     if (type.hasDate) {
       result.push({ label: '公開日', code: '{{page.publishedAt}}' })
@@ -35,24 +36,15 @@ export const contentTypesMixin: Partial<CmsComponent> & ThisType<CmsComponent> =
         code: "{{formatDate page.publishedAt 'YYYY年MM月DD日'}}",
       })
     }
-    // カテゴリ: hasCategory === true のときのみ
-    if (type.hasCategory) {
-      result.push({ label: 'カテゴリ', code: '{{page.category}}' })
-    }
-    // タグ: hasTag === true のときのみ
-    if (type.hasTag) {
-      result.push({
-        label: 'タグ（ループ）',
-        code: '{{#each page.tags}}\n  <span class="tag">{{this}}</span>\n{{/each}}',
-      })
-    }
-    // サムネイル画像: hasThumbnail === true のときのみ
-    if (type.hasThumbnail) {
-      result.push({
-        label: 'サムネイル画像',
-        code: '{{#if page.image}}<img src="{{page.image}}" alt="{{page.title}}">{{/if}}',
-      })
-    }
+    result.push({ label: 'カテゴリ', code: '{{page.category}}' })
+    result.push({
+      label: 'タグ（ループ）',
+      code: '{{#each page.tags}}\n  <span class="tag">{{this}}</span>\n{{/each}}',
+    })
+    result.push({
+      label: 'サムネイル画像',
+      code: '{{#if page.image}}<img src="{{page.image}}" alt="{{page.title}}">{{/if}}',
+    })
     // メタ情報は常に存在する
     result.push({ label: '更新日', code: '{{page._meta.updatedAt}}' })
     result.push({ label: '著者', code: '{{page._meta.author}}' })
@@ -174,6 +166,43 @@ export const contentTypesMixin: Partial<CmsComponent> & ThisType<CmsComponent> =
     return fallbackFields || []
   },
 
+  /** 表示条件（ロケーションルール）が指定コンテキストに一致するフィールドグループを返す。
+   *  value === '*' はその種別すべてにマッチ。 */
+  fieldGroupsForContext(kind: 'page' | 'contentType', id: string): FieldGroup[] {
+    return this.fieldGroups.filter((g) =>
+      (g.locations || []).some(
+        (loc) => loc.target === kind && (loc.value === id || loc.value === '*'),
+      ),
+    )
+  },
+
+  /** 投稿タイプに表示すべきフィールドグループ（表示条件＋後方互換の fieldGroupIds、重複排除） */
+  fieldGroupsForType(type: ContentType): FieldGroup[] {
+    const seen = new Set<string>()
+    const groups: FieldGroup[] = []
+    for (const g of this.fieldGroupsForContext('contentType', type.id)) {
+      if (!seen.has(g.id)) {
+        seen.add(g.id)
+        groups.push(g)
+      }
+    }
+    for (const gid of type.fieldGroupIds || []) {
+      const g = this.fieldGroups.find((x) => x.id === gid)
+      if (g && !seen.has(g.id)) {
+        seen.add(g.id)
+        groups.push(g)
+      }
+    }
+    return groups
+  },
+
+  /** 投稿タイプの全カスタムフィールド（フィールドグループ優先、無ければ後方互換の inline fields） */
+  fieldsForType(type: ContentType): FieldDefinition[] {
+    const groups = this.fieldGroupsForType(type)
+    if (groups.length) return groups.flatMap((g) => g.fields)
+    return type.fields || []
+  },
+
   async loadFieldGroupEditor() {
     if (!this.fs) return
     this.fieldGroups = await this.fs.readFieldGroups()
@@ -184,6 +213,7 @@ export const contentTypesMixin: Partial<CmsComponent> & ThisType<CmsComponent> =
 
   openFieldGroup(group: FieldGroup) {
     this.currentFieldGroup = JSON.parse(JSON.stringify(group))
+    if (!this.currentFieldGroup!.locations) this.currentFieldGroup!.locations = []
     // UI用プロパティ付与
     this.currentFieldGroup!.fields = this.currentFieldGroup!.fields.map((f: any) => ({
       ...f,
@@ -202,7 +232,22 @@ export const contentTypesMixin: Partial<CmsComponent> & ThisType<CmsComponent> =
       id: '',
       label: '',
       fields: [],
+      locations: [],
     }
+  },
+
+  /** 表示条件の行を1つ追加（既定は「すべての固定ページ」） */
+  addLocationRule() {
+    if (!this.currentFieldGroup) return
+    if (!this.currentFieldGroup.locations) this.currentFieldGroup.locations = []
+    this.currentFieldGroup.locations.push({ target: 'page', value: '*' })
+  },
+
+  /** select の "target:value" 文字列を LocationRule に変換 */
+  parseLocationOption(v: string): LocationRule {
+    const idx = v.indexOf(':')
+    const target = v.slice(0, idx) as 'page' | 'contentType'
+    return { target, value: v.slice(idx + 1) }
   },
 
   addFieldToGroup() {
@@ -313,10 +358,14 @@ export const contentTypesMixin: Partial<CmsComponent> & ThisType<CmsComponent> =
       if (!field.subFields || field.subFields.length === 0) delete field.subFields
       return field
     })
+    const cleanedLocations = (g.locations || []).filter(
+      (loc) => loc && (loc.target === 'page' || loc.target === 'contentType') && loc.value,
+    )
     await this.fs.writeJson(`content/_fieldGroups/${g.id}.json`, {
       id: g.id,
       label: g.label,
       fields: cleanedFields,
+      ...(cleanedLocations.length ? { locations: cleanedLocations } : {}),
     })
     this.fieldGroups = await this.fs.readFieldGroups()
     this.showToast(`${g.label} を保存しました`)

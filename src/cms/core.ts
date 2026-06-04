@@ -14,7 +14,6 @@ import {
   AUTOSAVE_DEBOUNCE_MS,
   PATH_SITE_CONFIG,
   PATH_LANGUAGES,
-  PATH_PAGES_CONFIG,
   PATH_TAXONOMIES_CATEGORIES,
   PATH_TAXONOMIES_TAGS,
   PATH_ASSETS_FILES,
@@ -352,11 +351,8 @@ export const coreMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     this.currentLang = this.languages.default || 'ja'
     this.contentTypes = await this.fs.readContentTypes()
     this.fieldGroups = await this.fs.readFieldGroups()
-    this.pagesConfig = (await this.fs.readJson<{
-      hasBody?: boolean
-      fieldGroupIds?: string[]
-      overrides?: Record<string, { hasBody?: boolean; fieldGroupIds?: string[] }>
-    }>(PATH_PAGES_CONFIG)) || { hasBody: true, fieldGroupIds: [] }
+    // 旧: 投稿タイプ側の fieldGroupIds → 新: フィールドグループ側の表示条件 へ自動移行
+    await this.migrateTypeFieldGroupsToLocations()
     // テーマ（アクティブ manifest と一覧）を読み込む（色/フォント選択肢・テーマ切替 UI 用）
     await this.loadActiveThemeManifest()
     await this.loadInstalledThemes()
@@ -370,6 +366,39 @@ export const coreMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     )
     this.availableCategories = cats?.items || []
     this.availableTags = tags?.items || []
+  },
+
+  /** 旧データ移行: 投稿タイプの fieldGroupIds を、各フィールドグループの表示条件
+   *  （locations: { target:'contentType', value:<typeId> }）へ移し替え、type 側からは除去する。
+   *  冪等。fieldGroupIds を持つタイプが無ければ何もしない。 */
+  async migrateTypeFieldGroupsToLocations() {
+    if (!this.fs) return
+    const pending = this.contentTypes.filter((t) => (t.fieldGroupIds?.length ?? 0) > 0)
+    if (!pending.length) return
+    let groupsChanged = false
+    for (const type of pending) {
+      for (const gid of type.fieldGroupIds || []) {
+        const g = this.fieldGroups.find((x) => x.id === gid)
+        if (!g) continue
+        if (!g.locations) g.locations = []
+        if (!g.locations.some((l) => l.target === 'contentType' && l.value === type.id)) {
+          g.locations.push({ target: 'contentType', value: type.id })
+          await this.fs.writeJson(`content/_fieldGroups/${g.id}.json`, {
+            id: g.id,
+            label: g.label,
+            fields: g.fields,
+            locations: g.locations,
+          })
+          groupsChanged = true
+        }
+      }
+      // type 側から fieldGroupIds を除去して書き戻す
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { fieldGroupIds, ...rest } = type
+      await this.fs.writeJson(`content/_types/${type.id}.json`, rest)
+      delete (type as { fieldGroupIds?: string[] }).fieldGroupIds
+    }
+    if (groupsChanged) this.fieldGroups = await this.fs.readFieldGroups()
   },
 
   /** 初回起動時に必要なフォルダ・ファイルを自動作成 */
@@ -409,9 +438,6 @@ export const coreMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
       icon: '📢',
       slug: 'news',
       order: 'date_desc',
-      hasCategory: true,
-      hasTag: true,
-      hasThumbnail: true,
       hasDate: true,
       pagination: 10,
       fields: [
@@ -445,16 +471,7 @@ export const coreMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
       },
     })
 
-    // ページ設定: すべての固定ページは既定で hasBody=true（本文編集）。
-    // フロントページも通常ページ扱い（特別な override は持たせない）。
-    // ※ home-* のフィールドグループはサンプルとして別途用意され、必要なら任意のページに割当可能。
-    await this.fs.writeJson(PATH_PAGES_CONFIG, {
-      hasBody: true,
-      fieldGroupIds: [],
-      overrides: {},
-    })
-
-    // フィールドグループ: トップページ用サンプル（製作者が自由に編集・追加・削除可能）
+    // フィールドグループ: サンプル（製作者が自由に編集・追加・削除可能。投稿タイプに割当可能）
     await this.fs.writeJson('content/_fieldGroups/home-hero.json', {
       id: 'home-hero',
       label: 'ヒーロー',

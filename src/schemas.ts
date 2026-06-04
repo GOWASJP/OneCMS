@@ -139,10 +139,20 @@ export const FieldDefinitionSchema = z.object({
 
 // ----- フィールドグループ -----
 
+/** フィールドグループの表示条件（ACF のロケーションルール相当）。
+ *  target: 'page'（固定ページ）/ 'contentType'（投稿タイプ）
+ *  value: 対象の id。'*' はその種別すべてにマッチ。 */
+export const LocationRuleSchema = z.object({
+  target: z.enum(['page', 'contentType']),
+  value: z.string(),
+})
+
 export const FieldGroupSchema = z.object({
   id: z.string(),
   label: z.string(),
   fields: z.array(FieldDefinitionSchema),
+  /** いずれかに一致する編集画面でこのグループを表示する（OR 条件） */
+  locations: z.array(LocationRuleSchema).optional(),
 })
 
 // ----- コンテンツタイプ -----
@@ -153,11 +163,8 @@ export const ContentTypeSchema = z.object({
   icon: z.string().optional(),
   slug: z.string(),
   order: z.string().optional(),
-  hasCategory: z.boolean().optional(),
-  hasTag: z.boolean().optional(),
-  hasThumbnail: z.boolean().optional(),
+  // タイトル・本文・サムネイル・カテゴリ・タグは全タイプ共通の既定項目（フラグ不要）。
   hasDate: z.boolean().optional(),
-  hasBody: z.boolean().optional(),
   pagination: z.number().optional(),
   fields: z.array(FieldDefinitionSchema).optional(), // 後方互換
   fieldGroupIds: z.array(z.string()).optional(),

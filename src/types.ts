@@ -7,6 +7,7 @@ import {
   ContentDataSchema,
   ShowIfConditionSchema,
   FieldDefinitionSchema,
+  LocationRuleSchema,
   FieldGroupSchema,
   ContentTypeSchema,
   ExportFileSchema,
@@ -36,6 +37,9 @@ export type ShowIfCondition = z.infer<typeof ShowIfConditionSchema>
 
 /** カスタムフィールド定義 */
 export type FieldDefinition = z.infer<typeof FieldDefinitionSchema>
+
+/** フィールドグループの表示条件（ロケーションルール） */
+export type LocationRule = z.infer<typeof LocationRuleSchema>
 
 /** フィールドグループ */
 export type FieldGroup = z.infer<typeof FieldGroupSchema>
