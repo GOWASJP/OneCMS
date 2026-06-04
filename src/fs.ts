@@ -418,16 +418,26 @@ export class FileSystem {
     return groups.sort((a, b) => a.label.localeCompare(b.label))
   }
 
-  /** テンプレートファイル一覧を取得 */
-  async readTemplateFiles(): Promise<Array<{ name: string; path: string; isComponent: boolean }>> {
+  /** 指定ディレクトリ直下のサブディレクトリ名一覧を返す（themes/ のテーマ列挙などに使用） */
+  async listSubdirectories(path: string): Promise<string[]> {
+    const dir = await this.getDir(path)
+    if (!dir) return []
+    const entries = await collectEntries(dir)
+    return entries.filter(([, handle]) => handle.kind === 'directory').map(([name]) => name)
+  }
+
+  /** テンプレートファイル一覧を取得（baseDir 配下。既定はアクティブテーマのフォルダを渡す） */
+  async readTemplateFiles(
+    baseDir = 'templates',
+  ): Promise<Array<{ name: string; path: string; isComponent: boolean }>> {
     const files: Array<{ name: string; path: string; isComponent: boolean }> = []
-    const dir = await this.getDir('templates')
+    const dir = await this.getDir(baseDir)
     if (!dir) return files
 
     const entries = await collectEntries(dir)
     for (const [name, handle] of entries) {
       if (handle.kind === 'file' && name.endsWith('.hbs')) {
-        files.push({ name, path: `templates/${name}`, isComponent: false })
+        files.push({ name, path: `${baseDir}/${name}`, isComponent: false })
       } else if (handle.kind === 'directory' && name === '_components') {
         const compDir = handle as FileSystemDirectoryHandle
         const compEntries = await collectEntries(compDir)
@@ -435,7 +445,7 @@ export class FileSystem {
           if (chandle.kind === 'file' && cname.endsWith('.hbs')) {
             files.push({
               name: cname,
-              path: `templates/_components/${cname}`,
+              path: `${baseDir}/_components/${cname}`,
               isComponent: true,
             })
           }

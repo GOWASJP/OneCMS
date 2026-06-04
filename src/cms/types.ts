@@ -75,6 +75,24 @@ export interface CmsComponent {
   checkVersionAndMigrate(): Promise<void>
   // フロントページ（/ にマップする固定ページ id）。siteConfig.frontPageId || 'index'
   readonly frontPageId: string
+  // アクティブテーマ id（themes/<id>/）。siteConfig.themeId || 'default'
+  readonly activeThemeId: string
+  // アクティブテーマの manifest（theme.json）。色/フォントの選択肢を供給する。
+  activeThemeManifest: {
+    id?: string
+    name?: string
+    version?: string
+    author?: string
+    description?: string
+    apiVersion?: string
+    colors?: Array<{ id: string; label: string; primary: string; secondary?: string }>
+    fonts?: Array<{ id: string; label: string; family: string; cdn?: string }>
+  } | null
+  // インストール済みテーマ一覧（themes/ をスキャン）
+  installedThemes: Array<{ id: string; name: string; version?: string; author?: string }>
+  loadActiveThemeManifest(): Promise<void>
+  loadInstalledThemes(): Promise<void>
+  switchTheme(id: string): Promise<void>
   // 拡張（Pro/プラグイン）が追加するサイドバー項目
   extensionNavItems: Array<{
     id: string

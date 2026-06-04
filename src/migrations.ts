@@ -17,6 +17,7 @@ import {
   LICENSE_ID,
   PATH_CMS_META,
   PATH_CMS_BACKUP_DIR,
+  PATH_SITE_CONFIG,
   type Edition,
 } from './constants.ts'
 
@@ -52,7 +53,50 @@ export interface Migration {
  *
  * 現時点では破壊的変更はないため空。バージョン記録のみ行われる。
  */
-export const MIGRATIONS: Migration[] = []
+export const MIGRATIONS: Migration[] = [
+  {
+    to: 2,
+    description: '単一 templates/ を差し替え可能なテーマパッケージ themes/default/ へ移行',
+    up: async (fs) => {
+      const hasThemes = !!(await fs.getDir('themes'))
+      const hasLegacy = !!(await fs.getDir('templates'))
+      // 旧構造（フラット templates/）かつ themes/ 未作成のときだけ移行（ユーザー編集を保全）
+      if (!hasLegacy || hasThemes) return
+      await fs.copyDir('templates', 'themes/default')
+      // theme.json が無ければ旧 config.json から生成（themes キー → colors に改称）
+      const manifest = await fs.readJson('themes/default/theme.json')
+      if (!manifest) {
+        const old =
+          (await fs.readJson<{
+            engine?: string
+            version?: string
+            name?: string
+            description?: string
+            author?: string
+            themes?: unknown[]
+            fonts?: unknown[]
+          }>('themes/default/config.json')) || {}
+        await fs.writeJson('themes/default/theme.json', {
+          id: 'default',
+          name: old.name || 'Default',
+          version: old.version || '1.0',
+          author: old.author || '',
+          description: old.description || '',
+          engine: old.engine || 'handlebars',
+          apiVersion: '1',
+          colors: old.themes || [],
+          fonts: old.fonts || [],
+        })
+      }
+      // アクティブテーマを default に設定
+      const site = await fs.readJson<Record<string, unknown>>(PATH_SITE_CONFIG)
+      if (site && !site.themeId) {
+        site.themeId = 'default'
+        await fs.writeJson(PATH_SITE_CONFIG, site)
+      }
+    },
+  },
+]
 
 /** 現在の本体が書き込むべきメタ情報 */
 export function currentMeta(): CmsMeta {
@@ -75,12 +119,14 @@ export async function writeMeta(fs: FileSystem, meta: CmsMeta): Promise<void> {
   await fs.writeJson(PATH_CMS_META, meta)
 }
 
-/** content/ と templates/ を .cms/backup/<timestamp>/ にスナップショットし、保存先パスを返す */
+/** content/・templates/・themes/ を .cms/backup/<timestamp>/ にスナップショットし、保存先パスを返す */
 export async function backupData(fs: FileSystem): Promise<string> {
   const stamp = new Date().toISOString().replace(/[:.]/g, '-')
   const dest = `${PATH_CMS_BACKUP_DIR}/${stamp}`
   await fs.copyDir('content', `${dest}/content`)
-  await fs.copyDir('templates', `${dest}/templates`)
+  // 旧構造（templates/）・新構造（themes/）はどちらか一方のことがあるので存在時のみ退避
+  if (await fs.getDir('templates')) await fs.copyDir('templates', `${dest}/templates`)
+  if (await fs.getDir('themes')) await fs.copyDir('themes', `${dest}/themes`)
   return dest
 }
 

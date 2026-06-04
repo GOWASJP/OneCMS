@@ -61,6 +61,7 @@ export const outputMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     }
 
     try {
+      await this.exporter.resolveThemeDir(this.activeThemeId)
       await this.exporter.registerPartials()
       const baseTemplate = await this.exporter.loadTemplate('_base')
       const pageTemplate = await this.exporter.loadTemplate(this.currentType ? 'detail' : 'page')
@@ -194,16 +195,66 @@ export const outputMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     }
   },
 
+  // --- テーマ（差し替え可能なパッケージ） ---
+
+  /** アクティブテーマの manifest（theme.json）を読み込む。色/フォントの選択肢を供給。 */
+  async loadActiveThemeManifest() {
+    if (!this.fs) return
+    const dir = `themes/${this.activeThemeId}`
+    this.activeThemeManifest =
+      (await this.fs.readJson(`${dir}/theme.json`)) ||
+      // 旧構造（フラット templates/config.json）からのフォールバック
+      (await this.fs.readJson('templates/config.json')) ||
+      null
+  },
+
+  /** themes/ をスキャンしてインストール済みテーマ一覧を作る。 */
+  async loadInstalledThemes() {
+    if (!this.fs) return
+    const ids = await this.fs.listSubdirectories('themes')
+    const themes: CmsComponent['installedThemes'] = []
+    for (const id of ids) {
+      const m = await this.fs.readJson<{ name?: string; version?: string; author?: string }>(
+        `themes/${id}/theme.json`,
+      )
+      if (m) themes.push({ id, name: m.name || id, version: m.version, author: m.author })
+    }
+    this.installedThemes = themes
+  },
+
+  /** アクティブテーマを切り替える。色/フォント選択は新テーマの選択肢に合わせて検証・調整。 */
+  async switchTheme(id: string) {
+    if (!this.fs || id === this.activeThemeId) return
+    this.siteConfig.themeId = id
+    await this.loadActiveThemeManifest()
+    // 旧テーマの配色/フォント id が新テーマに無ければ、新テーマの先頭プリセットへ。
+    const colors = this.activeThemeManifest?.colors || []
+    const fonts = this.activeThemeManifest?.fonts || []
+    const cur = this.siteConfig.theme || {}
+    const color = colors.find((c) => c.id === cur.id) || colors[0]
+    const font = fonts.find((f) => f.id === cur.fontId) || fonts[0]
+    this.siteConfig.theme = {
+      ...(color ? { id: color.id, primary: color.primary, secondary: color.secondary } : {}),
+      ...(font ? { fontId: font.id, fontFamily: font.family, fontCdn: font.cdn || '' } : {}),
+    }
+    await this.saveSiteConfig()
+    this.showToast(`テーマを「${this.activeThemeManifest?.name || id}」に切り替えました`)
+  },
+
   // --- テンプレートエディタ ---
 
   async loadTemplateEditor() {
     if (!this.fs) return
-    this.templateFiles = await this.fs.readTemplateFiles()
+    // アクティブテーマのフォルダを編集対象に（無ければ旧 templates/ にフォールバック）
+    const dir = `themes/${this.activeThemeId}`
+    let files = await this.fs.readTemplateFiles(dir)
+    if (!files.length) files = await this.fs.readTemplateFiles('templates')
+    this.templateFiles = files
     this.currentTemplateFile = ''
     this.templateCode = ''
     this.view = 'templates'
     this.updateHash()
-    // 既定テンプレートの更新有無をチェック
+    // 既定テンプレートの更新有無をチェック（同梱デフォルトテーマがアクティブなときのみ）
     await this.checkTemplateUpdates()
   },
 
@@ -214,6 +265,14 @@ export const outputMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
    */
   async checkTemplateUpdates() {
     if (!this.fs || !this.diffEngine) return
+    // 同梱の既定テンプレート（INITIAL_TEMPLATES = themes/default/）との比較なので、
+    // デフォルトテーマがアクティブなときのみ意味を持つ。他テーマ使用時は更新提案を出さない。
+    if (this.activeThemeId !== 'default') {
+      this.templateUpdates = []
+      this.selectedUpdatePath = ''
+      this.templateUpdateDiff = null
+      return
+    }
     const baseline = (await this.fs.readJson<Record<string, string>>(PATH_TEMPLATES_BASELINE)) || {}
     const updates: Array<{ path: string; name: string; status: 'safe' | 'conflict' }> = []
     let baselineChanged = false

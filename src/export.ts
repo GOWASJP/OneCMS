@@ -65,6 +65,8 @@ const notFoundMessages: Record<string, { title: string; body: string; home: stri
 export class Exporter {
   private fs: FileSystem
   private handlebars: typeof Handlebars
+  /** テンプレート解決元ディレクトリ（アクティブテーマ themes/<id>/。無ければ旧 templates/ にフォールバック）。exportAll で確定。 */
+  private themeDir = 'templates'
   /** 直近の exportAll で算出したソース署名（呼び出し側が成功後に保存する） */
   lastSourceHash = ''
 
@@ -277,16 +279,23 @@ export class Exporter {
     })
   }
 
-  /** テンプレートファイルを読み込みコンパイル */
+  /** アクティブテーマのフォルダを解決（themes/<id>/。無ければ旧 templates/ にフォールバック）。
+   *  exportAll は自動で呼ぶ。プレビュー等で loadTemplate を直接使う前にも呼ぶこと。 */
+  async resolveThemeDir(themeId: string): Promise<void> {
+    const dir = `themes/${themeId}`
+    this.themeDir = (await this.fs.getDir(dir)) ? dir : 'templates'
+  }
+
+  /** テンプレートファイルを読み込みコンパイル（アクティブテーマから） */
   async loadTemplate(name: string): Promise<TemplateFunction | null> {
-    const source = await this.fs.readText(`templates/${name}.hbs`)
+    const source = await this.fs.readText(`${this.themeDir}/${name}.hbs`)
     if (!source) return null
     return this.handlebars.compile(source)
   }
 
   /** パーシャル（コンポーネント）を一括登録 */
   async registerPartials(): Promise<void> {
-    const componentsDir = await this.fs.getDir('templates/_components')
+    const componentsDir = await this.fs.getDir(`${this.themeDir}/_components`)
     if (!componentsDir) return
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -348,6 +357,7 @@ export class Exporter {
     onProgress?: (step: number, total: number) => void,
     force = false,
   ): Promise<ExportFile[] | null> {
+    await this.resolveThemeDir(siteConfig.themeId || 'default')
     await this.registerPartials()
 
     const baseTemplate = await this.loadTemplate('_base')

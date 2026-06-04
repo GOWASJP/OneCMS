@@ -3010,49 +3010,67 @@
                     公開サイトのデザイン
                   </h2>
 
-                  <!-- カラーテーマ（公開サイト） -->
+                  <!-- テーマ（差し替え可能なパッケージ。themes/<id>/ をスキャン） -->
+                  <div>
+                    <label class="gh-label">テーマ</label>
+                    <div class="flex flex-col gap-2">
+                      <template x-for="t in installedThemes" :key="t.id">
+                        <button
+                          @click="switchTheme(t.id)"
+                          class="flex items-center justify-between gap-2 px-3 py-2 rounded-md border text-sm text-left transition-all"
+                          :class="activeThemeId === t.id ? 'border-[var(--ds-primary-600)] bg-[var(--ds-primary-100)] text-[var(--ds-primary-600)]' : 'border-[var(--ds-border-default)] text-[var(--ds-text-body)] hover:border-[var(--ds-border-strong)]'"
+                        >
+                          <span class="min-w-0">
+                            <span class="font-medium" x-text="t.name"></span>
+                            <span
+                              class="text-[11px] text-[var(--ds-text-muted)]"
+                              x-text="(t.version ? ' v' + t.version : '') + (t.author ? ' / ' + t.author : '')"
+                            ></span>
+                          </span>
+                          <template x-if="activeThemeId === t.id">
+                            <span class="shrink-0 text-[11px] font-semibold">使用中</span>
+                          </template>
+                        </button>
+                      </template>
+                      <p class="text-[11px] text-[var(--ds-text-muted)] leading-snug">
+                        テーマは
+                        <code class="font-mono">themes/&lt;id&gt;/</code>
+                        フォルダの差し替え可能なパッケージです。別フォルダを置くとここに表示され、切り替えられます。色/フォントの選択肢は選択中テーマの
+                        <code class="font-mono">theme.json</code>
+                        が提供します。
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- カラーテーマ（選択肢は theme.json 由来。公開サイトに反映） -->
                   <div>
                     <label class="gh-label">カラーテーマ</label>
                     <div class="flex gap-2 flex-wrap">
-                      <template
-                        x-for="t in [
-                        {id:'indigo',label:'インディゴ',color:'#271FE0'},
-                        {id:'blue',label:'ブルー',color:'#2563eb'},
-                        {id:'green',label:'グリーン',color:'#16a34a'},
-                        {id:'navy',label:'ネイビー',color:'#1e3a5f'},
-                        {id:'red',label:'レッド',color:'#dc2626'},
-                        {id:'purple',label:'パープル',color:'#7c3aed'}
-                      ]"
-                        :key="t.id"
-                      >
+                      <template x-for="c in (activeThemeManifest?.colors || [])" :key="c.id">
                         <button
-                          @click="siteConfig.theme = {...(siteConfig.theme||{}), id: t.id, primary: t.color}"
+                          @click="siteConfig.theme = {...(siteConfig.theme||{}), id: c.id, primary: c.primary, secondary: c.secondary}"
                           class="flex items-center gap-2 px-3 py-2 rounded-md border text-sm transition-all"
-                          :class="(siteConfig.theme?.id || 'indigo') === t.id ? 'border-[var(--ds-primary-600)] bg-[var(--ds-primary-100)] font-semibold text-[var(--ds-primary-600)]' : 'border-[var(--ds-border-default)] text-[var(--ds-text-body)] hover:border-[var(--ds-border-strong)]'"
+                          :class="siteConfig.theme?.id === c.id ? 'border-[var(--ds-primary-600)] bg-[var(--ds-primary-100)] font-semibold text-[var(--ds-primary-600)]' : 'border-[var(--ds-border-default)] text-[var(--ds-text-body)] hover:border-[var(--ds-border-strong)]'"
                         >
-                          <span class="w-4 h-4 rounded-full" :style="'background:'+t.color"></span>
-                          <span x-text="t.label"></span>
+                          <span
+                            class="w-4 h-4 rounded-full"
+                            :style="'background:'+c.primary"
+                          ></span>
+                          <span x-text="c.label"></span>
                         </button>
                       </template>
                     </div>
                   </div>
 
-                  <!-- フォント -->
+                  <!-- フォント（選択肢は theme.json 由来。family/cdn も保存して実際に反映） -->
                   <div>
                     <label class="gh-label">フォント</label>
                     <div class="flex gap-2 flex-wrap">
-                      <template
-                        x-for="f in [
-                        {id:'system',label:'システムフォント'},
-                        {id:'noto',label:'Noto Sans JP'},
-                        {id:'mincho',label:'明朝体'}
-                      ]"
-                        :key="f.id"
-                      >
+                      <template x-for="f in (activeThemeManifest?.fonts || [])" :key="f.id">
                         <button
-                          @click="siteConfig.theme = {...(siteConfig.theme||{}), fontId: f.id}"
+                          @click="siteConfig.theme = {...(siteConfig.theme||{}), fontId: f.id, fontFamily: f.family, fontCdn: f.cdn || ''}"
                           class="px-3 py-2 rounded-md border text-sm transition-all"
-                          :class="(siteConfig.theme?.fontId || 'system') === f.id ? 'border-[var(--ds-primary-600)] bg-[var(--ds-primary-600)]/5 font-semibold' : 'border-[var(--ds-border-default)] hover:border-[var(--ds-border-strong)]'"
+                          :class="siteConfig.theme?.fontId === f.id ? 'border-[var(--ds-primary-600)] bg-[var(--ds-primary-600)]/5 font-semibold' : 'border-[var(--ds-border-default)] hover:border-[var(--ds-border-strong)]'"
                         >
                           <span x-text="f.label"></span>
                         </button>

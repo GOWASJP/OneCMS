@@ -670,7 +670,8 @@ export const TEMPLATE_DESCRIPTIONS: Record<string, string> = {
   'page.hbs': '固定ページ（会社概要・利用規約など）',
   'list.hbs': '投稿タイプの一覧ページ',
   'detail.hbs': '投稿タイプの詳細ページ',
-  'config.json': 'テンプレートパックのメタ情報',
+  'theme.json':
+    'テーマ manifest（名前/版/作者＋カラー・フォントの選択肢を宣言。Theme API 版を示す apiVersion）',
 
   // コンポーネント（再利用パーシャル）
   'head.hbs': '<head> 内の meta タグ・SEO・スタイル',

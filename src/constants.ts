@@ -23,7 +23,7 @@ export const STAMP_VERSION = 1
 
 // データ（content/templates）のスキーマバージョン。
 // 破壊的な構造変更を加えたら +1 し、src/migrations.ts にマイグレーションを追加する。
-export const SCHEMA_VERSION = 1
+export const SCHEMA_VERSION = 2
 
 // --- ストレージ ---
 export const STORAGE_DB_NAME = 'one-cms'
@@ -57,6 +57,10 @@ export const PATH_LANGUAGES = 'content/languages.json'
 export const PATH_TYPES_DIR = 'content/_types'
 export const PATH_PAGES_DIR = 'content/pages'
 export const PATH_PAGES_CONFIG = 'content/pages/_config.json'
+// テーマ（出力サイトのテンプレートパック）の置き場。themes/<theme-id>/ 配下に theme.json と *.hbs。
+export const PATH_THEMES = 'themes'
+// 旧構造（フラットな単一テーマ）。移行・フォールバック用。
+export const PATH_TEMPLATES_LEGACY = 'templates'
 export const PATH_TAXONOMIES_CATEGORIES = 'content/taxonomies/categories.json'
 export const PATH_TAXONOMIES_TAGS = 'content/taxonomies/tags.json'
 export const PATH_MENUS = 'content/menus.json'

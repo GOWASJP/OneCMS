@@ -8,6 +8,8 @@ export const SiteConfigSchema = z.object({
   description: z.string(),
   // フロントページ（/ にマップする固定ページの id）。未設定時は 'index' にフォールバック。
   frontPageId: z.string().optional(),
+  // アクティブテーマの id（プロジェクトフォルダ内 themes/<id>/）。未設定時は 'default'。
+  themeId: z.string().optional(),
   favicon: z.string().optional(),
   logo: z.string().optional(),
   customHeadScript: z.string().optional(),

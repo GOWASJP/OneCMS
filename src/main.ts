@@ -41,6 +41,11 @@ Alpine.data('cms', () => {
       return this.siteConfig?.frontPageId || 'index'
     },
 
+    // アクティブテーマ id（themes/<id>/）。未設定サイトは 'default' にフォールバック。
+    get activeThemeId(): string {
+      return this.siteConfig?.themeId || 'default'
+    },
+
     get viewTitle(): string {
       if (this.view === 'page-edit' && this.currentPage)
         return this.currentPage.title || this.currentPage.id

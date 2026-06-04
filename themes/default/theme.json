@@ -1,10 +1,12 @@
 {
-  "engine": "handlebars",
-  "version": "1.0",
+  "id": "default",
   "name": "GOWAS Default",
-  "description": "行政・コーポレートサイト向けデフォルトテンプレート",
+  "version": "1.0",
   "author": "GOWAS LLC",
-  "themes": [
+  "description": "行政・コーポレートサイト向けデフォルトテーマ",
+  "engine": "handlebars",
+  "apiVersion": "1",
+  "colors": [
     { "id": "blue", "label": "ブルー", "primary": "#2563eb", "secondary": "#1e40af" },
     { "id": "green", "label": "グリーン", "primary": "#16a34a", "secondary": "#15803d" },
     { "id": "navy", "label": "ネイビー", "primary": "#1e3a5f", "secondary": "#0f2440" },

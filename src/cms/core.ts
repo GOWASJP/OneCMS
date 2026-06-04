@@ -326,10 +326,13 @@ export const coreMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
 
     // 初回起動時に初期データを自動生成
     await this.ensureInitialData()
+    // データ形式のバージョン確認・必要なら移行。
+    // ※ ensureMissingTemplates より前に実行すること。旧 templates/ → themes/default/ への
+    //   移行は「themes/ がまだ無い」ことを条件にユーザー編集を保全するため、先に themes/ を
+    //   作ってしまう ensureMissingTemplates より前である必要がある。
+    await this.checkVersionAndMigrate()
     // バンドル内のテンプレートで未作成のものがあれば補完（既存ファイルは上書きしない）
     await this.ensureMissingTemplates()
-    // データ形式のバージョン確認・必要なら移行（content/templates を読む前に実行）
-    await this.checkVersionAndMigrate()
 
     this.siteConfig = (await this.fs.readJson<SiteConfig>(PATH_SITE_CONFIG)) || {
       name: '',
@@ -351,6 +354,9 @@ export const coreMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
       fieldGroupIds?: string[]
       overrides?: Record<string, { hasBody?: boolean; fieldGroupIds?: string[] }>
     }>(PATH_PAGES_CONFIG)) || { hasBody: true, fieldGroupIds: [] }
+    // テーマ（アクティブ manifest と一覧）を読み込む（色/フォント選択肢・テーマ切替 UI 用）
+    await this.loadActiveThemeManifest()
+    await this.loadInstalledThemes()
     this.pages = await this.fs.readPages(this.currentLang)
     // カテゴリ・タグ読み込み
     const cats = await this.fs.readJson<{ items: Array<{ id: string; label: string }> }>(
@@ -377,6 +383,7 @@ export const coreMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
       url: '',
       description: '',
       frontPageId: 'index',
+      themeId: 'default',
       nav: [
         { label: 'ホーム', url: '/' },
         { label: '会社概要', url: '/about/' },

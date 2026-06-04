@@ -141,6 +141,10 @@ export function createInitialState(): Partial<CmsComponent> & ThisType<CmsCompon
     langEditorData: { default: 'ja', locales: [] },
 
     // テンプレートエディタ
+    // テーマ（差し替え可能なパッケージ）
+    activeThemeManifest: null as CmsComponent['activeThemeManifest'],
+    installedThemes: [] as CmsComponent['installedThemes'],
+
     templateFiles: [] as Array<{ name: string; path: string; isComponent: boolean }>,
 
     currentTemplateFile: '',
