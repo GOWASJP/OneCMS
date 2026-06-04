@@ -1,0 +1,97 @@
+/**
+ * 管理画面UIの翻訳カタログ。
+ *
+ * - **シンボリックキー方式**（i18next 風）。キーは言語非依存の識別子（例 `nav.pages`）で、
+ *   どの言語の担当者でも読める。日本語も英語も「同じキーに対する訳」を持つ対等な言語。
+ * - 言語ごとに独立: 実運用では content/i18n/<locale>.json に書き出され、外部エディタで編集可能。
+ *   新言語の追加は en.json か ja.json をコピーして値を訳すだけ。
+ * - ここの内容は初回生成時の既定値（フォールバックも兼ねる）。
+ */
+export const UI_LOCALES = ['ja', 'en'] as const
+
+export const DEFAULT_UI_CATALOGS: Record<string, Record<string, string>> = {
+  ja: {
+    // サイドバー: セクション見出し
+    'nav.section.create': 'つくる',
+    'nav.section.organize': 'ととのえる',
+    'nav.section.inspect': '点検・ツール',
+    'nav.section.settings': '設定',
+    // サイドバー: 項目
+    'nav.pages': 'ページ一覧',
+    'nav.addType': 'タイプ追加',
+    'nav.menus': 'メニュー',
+    'nav.categories': 'カテゴリ',
+    'nav.tags': 'タグ',
+    'nav.fields': 'フィールド',
+    'nav.themes': 'テーマ',
+    'nav.themeDev': 'テーマ開発',
+    'nav.siteInfo': 'サイト情報',
+    'nav.systemSettings': 'システム設定',
+    // トップバー / 共通
+    'btn.preview': 'プレビュー',
+    'btn.history': '履歴',
+    'btn.save': '保存',
+    'btn.export': '書き出し',
+    'status.unsaved': '未保存',
+    'status.saving': '保存中…',
+    'status.saved': '保存済み',
+    // システム設定 画面
+    'settings.intro':
+      'この画面は ONE CMS 自体の動作設定です。サイトに関する情報（サイト名・カラーテーマなど）はサイドバーの「サイト情報」から編集してください。',
+    'settings.version': 'バージョン情報',
+    'settings.appVersion': '本体バージョン',
+    'settings.dataFormat': 'データ形式',
+    'settings.display': '表示',
+    'settings.adminTheme': '管理画面テーマ',
+    'theme.light': 'ライト',
+    'theme.dark': 'ダーク',
+    'theme.system': 'システム連動',
+    'settings.themeNote':
+      'ブラウザ単位の設定です。同じユーザーでも別の PC・ブラウザでは個別に設定します',
+    'settings.adminLanguage': '管理画面の言語',
+    'settings.adminLanguageNote':
+      '管理画面の表示言語です（コンテンツの公開言語とは別）。端末ごとに保存されます。',
+    'settings.timezone': 'タイムゾーン',
+    'settings.timezoneNote': '日付や公開日の表示に使うタイムゾーンです。サイト全体に適用されます。',
+  },
+  en: {
+    'nav.section.create': 'Create',
+    'nav.section.organize': 'Organize',
+    'nav.section.inspect': 'Inspect & Tools',
+    'nav.section.settings': 'Settings',
+    'nav.pages': 'Pages',
+    'nav.addType': 'Add type',
+    'nav.menus': 'Menus',
+    'nav.categories': 'Categories',
+    'nav.tags': 'Tags',
+    'nav.fields': 'Fields',
+    'nav.themes': 'Themes',
+    'nav.themeDev': 'Theme dev',
+    'nav.siteInfo': 'Site info',
+    'nav.systemSettings': 'System settings',
+    'btn.preview': 'Preview',
+    'btn.history': 'History',
+    'btn.save': 'Save',
+    'btn.export': 'Export',
+    'status.unsaved': 'Unsaved',
+    'status.saving': 'Saving…',
+    'status.saved': 'Saved',
+    'settings.intro':
+      'This screen configures ONE CMS itself. Site-related information (site name, etc.) can be edited from “Site info” in the sidebar.',
+    'settings.version': 'Version',
+    'settings.appVersion': 'App version',
+    'settings.dataFormat': 'Data format',
+    'settings.display': 'Display',
+    'settings.adminTheme': 'Admin theme',
+    'theme.light': 'Light',
+    'theme.dark': 'Dark',
+    'theme.system': 'System',
+    'settings.themeNote':
+      'Stored per browser. The same user has separate settings on a different PC or browser.',
+    'settings.adminLanguage': 'Admin language',
+    'settings.adminLanguageNote':
+      'Display language of the admin UI (separate from content publishing languages). Stored per device.',
+    'settings.timezone': 'Timezone',
+    'settings.timezoneNote': 'Timezone used to display dates and publish dates. Applied site-wide.',
+  },
+}

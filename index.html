@@ -141,14 +141,14 @@
                   </button>
                 </template>
 
-                <div class="gh-nav-section">つくる</div>
+                <div class="gh-nav-section" x-text="t('nav.section.create')"></div>
                 <button
                   @click="loadPageList()"
                   :class="view === 'page-list' || view === 'page-edit' ? 'gh-nav-active' : ''"
                   class="gh-nav-item w-full"
                 >
                   <i data-lucide="file-text" class="w-[18px] h-[18px]"></i>
-                  <span>ページ一覧</span>
+                  <span x-text="t('nav.pages')"></span>
                 </button>
 
                 <template x-for="type in contentTypes" :key="type.id">
@@ -166,17 +166,17 @@
                   class="gh-nav-item w-full text-[var(--ds-text-subtle)]"
                 >
                   <i data-lucide="plus" class="w-[18px] h-[18px]"></i>
-                  <span>タイプ追加</span>
+                  <span x-text="t('nav.addType')"></span>
                 </button>
 
-                <div class="gh-nav-section">ととのえる</div>
+                <div class="gh-nav-section" x-text="t('nav.section.organize')"></div>
                 <button
                   @click="loadMenus()"
                   :class="view === 'menus' ? 'gh-nav-active' : ''"
                   class="gh-nav-item w-full"
                 >
                   <i data-lucide="menu" class="w-[18px] h-[18px]"></i>
-                  <span>メニュー</span>
+                  <span x-text="t('nav.menus')"></span>
                 </button>
                 <button
                   @click="loadTaxonomy('categories')"
@@ -184,7 +184,7 @@
                   class="gh-nav-item w-full"
                 >
                   <i data-lucide="folder-tree" class="w-[18px] h-[18px]"></i>
-                  <span>カテゴリ</span>
+                  <span x-text="t('nav.categories')"></span>
                 </button>
                 <button
                   @click="loadTaxonomy('tags')"
@@ -192,7 +192,7 @@
                   class="gh-nav-item w-full"
                 >
                   <i data-lucide="tag" class="w-[18px] h-[18px]"></i>
-                  <span>タグ</span>
+                  <span x-text="t('nav.tags')"></span>
                 </button>
                 <button
                   @click="loadFieldGroupEditor()"
@@ -200,7 +200,7 @@
                   class="gh-nav-item w-full"
                 >
                   <i data-lucide="columns-3" class="w-[18px] h-[18px]"></i>
-                  <span>フィールド</span>
+                  <span x-text="t('nav.fields')"></span>
                 </button>
                 <button
                   @click="loadThemesPage()"
@@ -208,7 +208,7 @@
                   class="gh-nav-item w-full"
                 >
                   <i data-lucide="palette" class="w-[18px] h-[18px]"></i>
-                  <span>テーマ</span>
+                  <span x-text="t('nav.themes')"></span>
                 </button>
 
                 <template x-if="location.hostname === 'localhost'">
@@ -218,13 +218,13 @@
                     class="gh-nav-item w-full"
                   >
                     <i data-lucide="code" class="w-[18px] h-[18px]"></i>
-                    <span>テーマ開発</span>
+                    <span x-text="t('nav.themeDev')"></span>
                   </button>
                 </template>
 
                 <!-- 点検・ツール（拡張: placement !== 'top'）。項目があるときだけ見出し -->
                 <template x-if="extensionNavItems.some((e) => e.placement !== 'top')">
-                  <div class="gh-nav-section">点検・ツール</div>
+                  <div class="gh-nav-section" x-text="t('nav.section.inspect')"></div>
                 </template>
                 <template
                   x-for="ext in extensionNavItems.filter((e) => e.placement !== 'top')"
@@ -240,14 +240,14 @@
                   </button>
                 </template>
 
-                <div class="gh-nav-section">設定</div>
+                <div class="gh-nav-section" x-text="t('nav.section.settings')"></div>
                 <button
                   @click="view = 'site-info'; updateHash()"
                   :class="view === 'site-info' ? 'gh-nav-active' : ''"
                   class="gh-nav-item w-full"
                 >
                   <i data-lucide="globe" class="w-[18px] h-[18px]"></i>
-                  <span>サイト情報</span>
+                  <span x-text="t('nav.siteInfo')"></span>
                 </button>
                 <button
                   @click="view = 'settings'; updateHash()"
@@ -255,7 +255,7 @@
                   class="gh-nav-item w-full"
                 >
                   <i data-lucide="settings" class="w-[18px] h-[18px]"></i>
-                  <span>システム設定</span>
+                  <span x-text="t('nav.systemSettings')"></span>
                 </button>
               </div>
             </template>
@@ -316,22 +316,40 @@
                 </span>
               </template>
               <template x-if="view === 'page-list'">
-                <span class="text-[var(--ds-text-heading)] font-medium">ページ</span>
+                <span
+                  class="text-[var(--ds-text-heading)] font-medium"
+                  x-text="t('nav.pages')"
+                ></span>
               </template>
               <template x-if="view === 'site-info'">
-                <span class="text-[var(--ds-text-heading)] font-medium">サイト情報</span>
+                <span
+                  class="text-[var(--ds-text-heading)] font-medium"
+                  x-text="t('nav.siteInfo')"
+                ></span>
               </template>
               <template x-if="view === 'settings'">
-                <span class="text-[var(--ds-text-heading)] font-medium">システム設定</span>
+                <span
+                  class="text-[var(--ds-text-heading)] font-medium"
+                  x-text="t('nav.systemSettings')"
+                ></span>
               </template>
               <template x-if="view === 'taxonomy-categories'">
-                <span class="text-[var(--ds-text-heading)] font-medium">カテゴリ</span>
+                <span
+                  class="text-[var(--ds-text-heading)] font-medium"
+                  x-text="t('nav.categories')"
+                ></span>
               </template>
               <template x-if="view === 'taxonomy-tags'">
-                <span class="text-[var(--ds-text-heading)] font-medium">タグ</span>
+                <span
+                  class="text-[var(--ds-text-heading)] font-medium"
+                  x-text="t('nav.tags')"
+                ></span>
               </template>
               <template x-if="view === 'field-groups'">
-                <span class="text-[var(--ds-text-heading)] font-medium">フィールド</span>
+                <span
+                  class="text-[var(--ds-text-heading)] font-medium"
+                  x-text="t('nav.fields')"
+                ></span>
               </template>
               <template x-if="view === 'templates'">
                 <span class="flex items-center gap-1.5">
@@ -354,31 +372,42 @@
                 <div
                   class="flex items-center gap-2 pr-2 mr-2 border-r border-[var(--ds-border-default)]"
                 >
-                  <button @click="showPreview()" class="gh-btn-outline text-xs" title="プレビュー">
+                  <button
+                    @click="showPreview()"
+                    class="gh-btn-outline text-xs"
+                    :title="t('btn.preview')"
+                  >
                     <i data-lucide="eye" class="w-3.5 h-3.5"></i>
-                    プレビュー
+                    <span x-text="t('btn.preview')"></span>
                   </button>
-                  <button @click="showRevisions()" class="gh-btn-outline text-xs" title="履歴">
+                  <button
+                    @click="showRevisions()"
+                    class="gh-btn-outline text-xs"
+                    :title="t('btn.history')"
+                  >
                     <i data-lucide="history" class="w-3.5 h-3.5"></i>
-                    履歴
+                    <span x-text="t('btn.history')"></span>
                   </button>
                   <span
                     class="gh-save-status"
                     x-show="isDirty || autoSaving"
-                    x-text="autoSaving ? '保存中…' : '未保存'"
+                    x-text="autoSaving ? t('status.saving') : t('status.unsaved')"
                   ></span>
                   <span
                     class="gh-save-status gh-save-status-ok"
                     x-show="!isDirty && !autoSaving && lastAutoSavedAt"
-                  >
-                    保存済み
-                  </span>
-                  <button @click="savePage()" class="gh-btn-green text-xs">保存</button>
+                    x-text="t('status.saved')"
+                  ></span>
+                  <button
+                    @click="savePage()"
+                    class="gh-btn-green text-xs"
+                    x-text="t('btn.save')"
+                  ></button>
                 </div>
               </template>
               <button @click="exportSite()" class="gh-btn-green text-[13px]">
                 <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-                書き出し
+                <span x-text="t('btn.export')"></span>
               </button>
             </div>
           </header>
@@ -929,7 +958,7 @@
                                             ></span>
                                             <span
                                               class="text-[10px] text-[var(--ds-text-muted)]"
-                                              x-text="item.publishedAt || ''"
+                                              x-text="formatDate(item.publishedAt)"
                                             ></span>
                                           </label>
                                         </template>
@@ -1249,7 +1278,7 @@
                           ></p>
                           <p
                             class="text-xs text-[var(--ds-text-muted)] mt-0.5"
-                            x-text="item.publishedAt || item._meta?.createdAt || ''"
+                            x-text="formatDate(item.publishedAt || item._meta?.createdAt)"
                           ></p>
                         </div>
                         <span
@@ -1788,7 +1817,7 @@
                                             ></span>
                                             <span
                                               class="text-[10px] text-[var(--ds-text-muted)]"
-                                              x-text="item.publishedAt || ''"
+                                              x-text="formatDate(item.publishedAt)"
                                             ></span>
                                           </label>
                                         </template>
@@ -3574,22 +3603,26 @@
             <template x-if="view === 'settings'">
               <div class="px-8 pt-0 pb-16 max-w-5xl mx-auto">
                 <div class="gh-editor-header">
-                  <h1 class="text-lg font-bold">システム設定</h1>
+                  <h1 class="text-lg font-bold" x-text="t('nav.systemSettings')"></h1>
                 </div>
-                <p class="text-xs text-[var(--ds-text-muted)] mb-6">
-                  この画面は ONE CMS
-                  自体の動作設定です。サイトに関する情報（サイト名・カラーテーマなど）はサイドバーの「サイト情報」から編集してください。
-                </p>
+                <p
+                  class="text-xs text-[var(--ds-text-muted)] mb-6"
+                  x-text="t('settings.intro')"
+                ></p>
                 <div class="space-y-5">
                   <!-- バージョン情報 -->
                   <div
                     class="rounded-lg border border-[var(--ds-border-default)] p-4 bg-[var(--ds-bg-muted)]"
                   >
-                    <h2 class="text-base font-bold text-[var(--ds-text-heading)] mb-2">
-                      バージョン情報
-                    </h2>
+                    <h2
+                      class="text-base font-bold text-[var(--ds-text-heading)] mb-2"
+                      x-text="t('settings.version')"
+                    ></h2>
                     <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
-                      <dt class="text-[var(--ds-text-muted)]">本体バージョン</dt>
+                      <dt
+                        class="text-[var(--ds-text-muted)]"
+                        x-text="t('settings.appVersion')"
+                      ></dt>
                       <dd class="text-[var(--ds-text-heading)]">
                         v
                         <span x-text="appVersion"></span>
@@ -3599,7 +3632,10 @@
                           x-text="edition === 'pro' ? 'PRO' : 'FREE'"
                         ></span>
                       </dd>
-                      <dt class="text-[var(--ds-text-muted)]">データ形式</dt>
+                      <dt
+                        class="text-[var(--ds-text-muted)]"
+                        x-text="t('settings.dataFormat')"
+                      ></dt>
                       <dd class="text-[var(--ds-text-heading)]">
                         v
                         <span x-text="dataSchemaVersion"></span>
@@ -3629,17 +3665,20 @@
                     </p>
                   </div>
 
-                  <h2 class="text-base font-bold text-[var(--ds-text-heading)]">表示</h2>
+                  <h2
+                    class="text-base font-bold text-[var(--ds-text-heading)]"
+                    x-text="t('settings.display')"
+                  ></h2>
 
                   <!-- 管理画面テーマ（light/dark/system） -->
                   <div>
-                    <label class="gh-label">管理画面テーマ</label>
+                    <label class="gh-label" x-text="t('settings.adminTheme')"></label>
                     <div class="flex gap-2 flex-wrap">
                       <template
                         x-for="mode in [
-                          {id:'light',label:'ライト',icon:'sun'},
-                          {id:'dark',label:'ダーク',icon:'moon'},
-                          {id:'system',label:'システム連動',icon:'monitor'}
+                          {id:'light',label:'theme.light',icon:'sun'},
+                          {id:'dark',label:'theme.dark',icon:'moon'},
+                          {id:'system',label:'theme.system',icon:'monitor'}
                         ]"
                         :key="mode.id"
                       >
@@ -3649,13 +3688,62 @@
                           :class="themeMode === mode.id ? 'border-[var(--ds-primary-600)] bg-[var(--ds-primary-100)] text-[var(--ds-primary-600)] font-semibold' : 'border-[var(--ds-border-default)] text-[var(--ds-text-body)] hover:border-[var(--ds-border-strong)]'"
                         >
                           <i :data-lucide="mode.icon" class="w-4 h-4"></i>
-                          <span x-text="mode.label"></span>
+                          <span x-text="t(mode.label)"></span>
                         </button>
                       </template>
                     </div>
-                    <p class="text-[11px] text-[var(--ds-text-muted)] mt-1">
-                      ブラウザ単位の設定です。同じユーザーでも別の PC・ブラウザでは個別に設定します
-                    </p>
+                    <p
+                      class="text-[11px] text-[var(--ds-text-muted)] mt-1"
+                      x-text="t('settings.themeNote')"
+                    ></p>
+                  </div>
+
+                  <!-- 管理画面の言語（i18n） -->
+                  <div>
+                    <label class="gh-label" x-text="t('settings.adminLanguage')"></label>
+                    <div class="flex gap-2 flex-wrap">
+                      <template
+                        x-for="loc in [{id:'ja',label:'日本語'},{id:'en',label:'English'}]"
+                        :key="loc.id"
+                      >
+                        <button
+                          @click="setUiLocale(loc.id)"
+                          class="flex items-center gap-2 px-3 py-2 rounded-md border text-sm transition-all"
+                          :class="uiLocale === loc.id ? 'border-[var(--ds-primary-600)] bg-[var(--ds-primary-100)] text-[var(--ds-primary-600)] font-semibold' : 'border-[var(--ds-border-default)] text-[var(--ds-text-body)] hover:border-[var(--ds-border-strong)]'"
+                        >
+                          <i data-lucide="languages" class="w-4 h-4"></i>
+                          <span x-text="loc.label"></span>
+                        </button>
+                      </template>
+                    </div>
+                    <p
+                      class="text-[11px] text-[var(--ds-text-muted)] mt-1"
+                      x-text="t('settings.adminLanguageNote')"
+                    ></p>
+                  </div>
+
+                  <!-- タイムゾーン -->
+                  <div>
+                    <label class="gh-label" x-text="t('settings.timezone')"></label>
+                    <select
+                      class="gh-select-light text-sm w-64"
+                      @change="setTimezone($event.target.value)"
+                    >
+                      <template
+                        x-for="tz in ['Asia/Tokyo','Asia/Seoul','Asia/Shanghai','Asia/Taipei','Asia/Singapore','Asia/Bangkok','Asia/Kolkata','Australia/Sydney','Europe/London','Europe/Paris','Europe/Berlin','America/New_York','America/Chicago','America/Los_Angeles','UTC']"
+                        :key="tz"
+                      >
+                        <option
+                          :value="tz"
+                          :selected="(siteConfig?.timezone || 'Asia/Tokyo') === tz"
+                          x-text="tz"
+                        ></option>
+                      </template>
+                    </select>
+                    <p
+                      class="text-[11px] text-[var(--ds-text-muted)] mt-1"
+                      x-text="t('settings.timezoneNote') + '（' + formatDate(new Date().toISOString(), true) + '）'"
+                    ></p>
                   </div>
                 </div>
               </div>

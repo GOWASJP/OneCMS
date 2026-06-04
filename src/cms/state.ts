@@ -4,12 +4,14 @@ import { type SiteConfig, type ContentData, type FieldGroup } from '../types.ts'
 import {
   STORAGE_AUTHOR_KEY,
   STORAGE_THEME_KEY,
+  STORAGE_UI_LOCALE_KEY,
   APP_VERSION,
   EDITION,
   LICENSE_ID,
   SCHEMA_VERSION,
   type ThemeMode,
 } from '../constants.ts'
+import { DEFAULT_UI_CATALOGS } from '../i18n-catalogs.ts'
 import {
   TEMPLATE_REFERENCE_GROUPS,
   CATEGORY_SNIPPETS,
@@ -30,6 +32,13 @@ export function createInitialState(): Partial<CmsComponent> & ThisType<CmsCompon
     view: 'welcome',
 
     currentLang: 'ja',
+
+    // 管理画面の表示言語（端末ごと。コンテンツ言語 currentLang とは別）。
+    // 初期描画のチラつきを避けるため、既定カタログを先読みしておく。
+    uiLocale: localStorage.getItem(STORAGE_UI_LOCALE_KEY) || 'ja',
+    uiCatalog:
+      DEFAULT_UI_CATALOGS[localStorage.getItem(STORAGE_UI_LOCALE_KEY) || 'ja'] ||
+      DEFAULT_UI_CATALOGS.ja,
 
     exporting: false,
     zipping: false,

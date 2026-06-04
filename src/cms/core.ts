@@ -349,6 +349,9 @@ export const coreMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     this.logoBlobUrl = await loadAssetBlobUrl(this.fs, this.siteConfig.logo)
     this.languages = (await this.fs.readJson<Languages>(PATH_LANGUAGES)) || this.languages
     this.currentLang = this.languages.default || 'ja'
+    // 管理画面UIの翻訳カタログを用意し、選択中UI言語のカタログを読み込む
+    await this.ensureI18nFiles()
+    await this.loadUiCatalog()
     this.contentTypes = await this.fs.readContentTypes()
     this.fieldGroups = await this.fs.readFieldGroups()
     // 旧: 投稿タイプ側の fieldGroupIds → 新: フィールドグループ側の表示条件 へ自動移行
@@ -416,6 +419,7 @@ export const coreMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
       description: '',
       frontPageId: 'index',
       themeId: 'default',
+      timezone: 'Asia/Tokyo',
       nav: [
         { label: 'ホーム', url: '/' },
         { label: '会社概要', url: '/about/' },

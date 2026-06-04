@@ -10,6 +10,8 @@ export const SiteConfigSchema = z.object({
   frontPageId: z.string().optional(),
   // アクティブテーマの id（プロジェクトフォルダ内 themes/<id>/）。未設定時は 'default'。
   themeId: z.string().optional(),
+  // 日付/時刻表示のタイムゾーン（IANA、例 'Asia/Tokyo'）。未設定時は既定値にフォールバック。
+  timezone: z.string().optional(),
   favicon: z.string().optional(),
   logo: z.string().optional(),
   customHeadScript: z.string().optional(),

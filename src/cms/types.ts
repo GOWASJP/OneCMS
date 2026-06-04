@@ -25,6 +25,15 @@ export interface CmsComponent {
   folderHandle: FileSystemDirectoryHandle | null
   view: string
   currentLang: string
+  // 管理画面の表示言語（i18n）。コンテンツ言語 currentLang とは別。
+  uiLocale: string
+  uiCatalog: Record<string, string>
+  t(key: string): string
+  setUiLocale(locale: string): Promise<void>
+  loadUiCatalog(): Promise<void>
+  ensureI18nFiles(): Promise<void>
+  formatDate(value: unknown, withTime?: boolean): string
+  setTimezone(tz: string): Promise<void>
   exporting: boolean
   zipping: boolean
   exportResult: ExportResult | null

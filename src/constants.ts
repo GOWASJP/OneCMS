@@ -30,6 +30,13 @@ export const STORAGE_DB_NAME = 'one-cms'
 export const STORAGE_HANDLE_KEY = 'rootFolder'
 export const STORAGE_AUTHOR_KEY = 'one-cms-author'
 export const STORAGE_THEME_KEY = 'one-cms-theme'
+/** 管理画面の表示言語（端末ごと。コンテンツ言語とは別） */
+export const STORAGE_UI_LOCALE_KEY = 'one-cms-ui-locale'
+
+/** 管理画面UI翻訳カタログの置き場（プロジェクト内・POファイル風に編集可能） */
+export const PATH_I18N_DIR = 'content/i18n'
+/** 日付/時刻表示の既定タイムゾーン（IANA） */
+export const DEFAULT_TIMEZONE = 'Asia/Tokyo'
 
 export type ThemeMode = 'light' | 'dark' | 'system'
 
