@@ -222,21 +222,12 @@ export const outputMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     this.installedThemes = themes
   },
 
-  /** アクティブテーマを切り替える。色/フォント選択は新テーマの選択肢に合わせて検証・調整。 */
+  /** アクティブテーマを切り替える。見た目はテーマ側で直接コーディングするため、
+   *  CMS は themeId を切り替えて保存するだけ（カラー/フォント設定は持たない）。 */
   async switchTheme(id: string) {
     if (!this.fs || id === this.activeThemeId) return
     this.siteConfig.themeId = id
     await this.loadActiveThemeManifest()
-    // 旧テーマの配色/フォント id が新テーマに無ければ、新テーマの先頭プリセットへ。
-    const colors = this.activeThemeManifest?.colors || []
-    const fonts = this.activeThemeManifest?.fonts || []
-    const cur = this.siteConfig.theme || {}
-    const color = colors.find((c) => c.id === cur.id) || colors[0]
-    const font = fonts.find((f) => f.id === cur.fontId) || fonts[0]
-    this.siteConfig.theme = {
-      ...(color ? { id: color.id, primary: color.primary, secondary: color.secondary } : {}),
-      ...(font ? { fontId: font.id, fontFamily: font.family, fontCdn: font.cdn || '' } : {}),
-    }
     await this.saveSiteConfig()
     this.showToast(`テーマを「${this.activeThemeManifest?.name || id}」に切り替えました`)
   },
