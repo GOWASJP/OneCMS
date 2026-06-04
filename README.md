@@ -1,12 +1,12 @@
 # ONE CMS
 
-ブラウザで `cms.html` を開くだけで動作する、インストール不要の静的サイトジェネレーター型CMSです。
+ブラウザで `onecms.html` を開くだけで動作する、インストール不要の静的サイトジェネレーター型CMSです。
 
 行政・自治体・コーポレートサイト向けに、WordPressのローカル起動→静的書き出しという重い運用を置き換えます。
 
 ## 特徴
 
-- **インストール不要** — `cms.html` をブラウザで開くだけ
+- **インストール不要** — `onecms.html` をブラウザで開くだけ
 - **サーバー不要** — ローカルサーバーもDB も不要。ブラウザ単体で完結
 - **オフライン完全動作** — インターネット接続不要
 - **非エンジニア対応** — 事務職員レベルで運用可能
@@ -15,19 +15,21 @@
 
 ## デモ
 
-1. [Releases](https://github.com/GOWASJP/GowasCMS/releases) から `cms.html` をダウンロード
+1. [Releases](https://github.com/GOWASJP/OneCMS/releases) から `onecms.html` をダウンロード
 2. Chrome または Edge で開く
 3. 担当者名を入力して「開始する」
 4. 空のフォルダを選択（初期データが自動生成されます）
 
-## スクリーンショット
+## 管理画面
 
-管理画面は Ghost CMS 風のダークサイドバー + クリーンな白い編集エリアのデザインです。
+Ghost CMS 風のダークサイドバー + クリーンな白い編集エリアのデザインです。
 
 - Editor.js によるブロックエディタ（画像ドラッグ&ドロップ対応）
-- コンテンツタイプの動的作成・カスタムフィールド
+- 投稿タイプの動的作成とカスタムフィールド（フィールドグループ＋表示条件）
 - 多言語対応（翻訳ステータス管理）
-- テーマカラー・フォント選択
+- テーマの切り替えと「テーマ開発」ワークスペース
+
+<!-- スクリーンショットを追加する場合: ![ONE CMS 管理画面](docs/screenshot.png) -->
 
 ## 技術スタック
 
@@ -47,20 +49,24 @@
 
 ```
 my-site/
-├── cms.html                ← ブラウザで開くだけ
+├── onecms.html             ← ブラウザで開くだけ
 ├── content/                ← コンテンツデータ（JSON）
 │   ├── site.json           サイト設定
 │   ├── languages.json      言語設定
 │   ├── _types/             投稿タイプ定義
+│   ├── _fieldGroups/       フィールドグループ（表示条件つき）
 │   ├── pages/              固定ページ
 │   ├── taxonomies/         カテゴリ・タグ
 │   └── {type}/             投稿データ
-├── templates/              ← Handlebarsテンプレート
-│   ├── _base.hbs           共通レイアウト
-│   ├── _components/        コンポーネント（14種）
-│   ├── page.hbs            固定ページ用
-│   ├── list.hbs            一覧用
-│   └── detail.hbs          詳細用
+├── themes/                 ← テーマ（差し替え可能なパッケージ）
+│   └── default/            既定テーマ
+│       ├── theme.json      テーマ定義（manifest）
+│       ├── _base.hbs       共通レイアウト
+│       ├── _components/    コンポーネント（14種）
+│       ├── home.hbs        フロントページ用
+│       ├── page.hbs        固定ページ用
+│       ├── list.hbs        一覧用
+│       └── detail.hbs      詳細用
 ├── assets/                 ← 画像・ファイル
 │   ├── images/             最適化済み（WebP）
 │   └── _originals/         元画像バックアップ
@@ -74,13 +80,13 @@ my-site/
 
 ## アップデート
 
-新しい版へは **新しい `cms.html` をダウンロードして差し替えるだけ** です（オフライン運用のため自動更新は行いません）。
+新しい版へは **新しい `onecms.html` をダウンロードして差し替えるだけ** です（オフライン運用のため自動更新は行いません）。
 
-- コンテンツ・テンプレート（フォルダ側のデータ）は本体と分離されているため、差し替えても保持されます
+- コンテンツ・テーマ（フォルダ側のデータ）は本体と分離されているため、差し替えても保持されます
 - データ形式に変更がある版では、起動時に**自動でデータを新形式へ移行**します。移行前には `.cms/backup/` にバックアップを作成します
 - 管理画面の「設定 → バージョン情報」で、本体バージョン・エディション・データ形式バージョンを確認できます
-- データが本体より新しい場合（古い `cms.html` で開いた場合）は警告を表示します
-- **既定テンプレートの差分提案アップデート**：新版で既定テンプレートが更新されると「テンプレート」画面に更新件数を表示。未編集ファイルは安全に一括更新でき、編集済みファイルは差分を確認してから取り込めます（あなたの変更を勝手に上書きしません）
+- データが本体より新しい場合（古い `onecms.html` で開いた場合）は警告を表示します
+- **既定テーマの差分提案アップデート**：新版で既定テーマが更新されると「テーマ開発」画面に更新件数を表示。未編集ファイルは安全に一括更新でき、編集済みファイルは差分を確認してから取り込めます（あなたの変更を勝手に上書きしません）
 
 ## 機能一覧
 
@@ -88,6 +94,7 @@ my-site/
 
 - 固定ページの作成・編集・削除
 - 投稿タイプの動的作成（カスタムフィールド定義）
+- フィールドグループと表示条件（対象の固定ページ・投稿タイプを指定する ACF 風ロケーションルール）
 - Editor.js ブロックエディタ（見出し/画像/リスト/引用/テーブル/コード/区切り/埋め込み）
 - 画像の自動最適化（WebP変換・リサイズ・EXIF除去）
 - カテゴリ・タグ管理
@@ -121,18 +128,18 @@ my-site/
 
 ### テーマ・デザイン
 
-- カラーテーマ選択（5色）
-- フォント選択（システムフォント / Noto Sans JP / 明朝体）
-- CSS カスタムプロパティで書き出し時に反映
-- 9種のHBSコンポーネント（hero/accordion/tabs/timeline/card-list/gallery等）
+- テーマは差し替え可能なパッケージ（`themes/<id>/`）。既定テーマもその1つで特別扱いしない
+- 管理画面の「テーマ」でインストール済みテーマを切り替え（WordPress の「外観 → テーマ」相当）
+- 「テーマ開発」ワークスペースで Handlebars テンプレートを直接編集（フィールド参照パネル付き・パネル幅はドラッグ調整可）
+- 14種の HBS コンポーネント（hero / accordion / tabs / timeline / card-list / gallery / nav / breadcrumb / pagination / header / footer / head / seo / styles）
 
 ## 開発
 
 ### セットアップ
 
 ```bash
-git clone https://github.com/GOWASJP/GowasCMS.git
-cd GowasCMS
+git clone https://github.com/GOWASJP/OneCMS.git
+cd OneCMS
 npm install
 ```
 
@@ -140,7 +147,7 @@ npm install
 
 ```bash
 npm run dev          # 開発サーバー起動
-npm run build        # cms.html をビルド（build/index.html）
+npm run build        # onecms.html をビルド（build/onecms.html）
 npm run preview      # ビルド結果のプレビュー
 npm run lint         # ESLint チェック
 npm run lint:fix     # ESLint 自動修正
@@ -152,9 +159,10 @@ npm run format       # Prettier フォーマット
 
 ```bash
 npm run build
-# → build/index.html (約1.5MB, gzip約540KB)
-# これを cms.html にリネームして配布
+# → build/onecms.html（約1.6MB, gzip約570KB）
 ```
+
+`vite-plugin-singlefile` で JS / CSS をすべてインライン化し、ビルド後に `build/index.html` を `build/onecms.html` へ自動リネームします。配布物はこの1ファイルのみです。
 
 ビルドサイズの大半は **オフライン完全動作のために同梱しているランタイム** です（インストール・サーバー不要という本製品の核となる特徴を支えるもの）。
 
