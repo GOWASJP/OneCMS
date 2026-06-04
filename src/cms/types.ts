@@ -43,6 +43,7 @@ export interface CmsComponent {
   editData: ContentData
 
   editor: EditorJS | null
+  fieldEditors: Record<string, EditorJS>
   revisions: RevisionEntry[]
   selectedRevision: RevisionEntry | null
   revisionDiff: string | null
@@ -160,7 +161,13 @@ export interface CmsComponent {
   initEditor(bodyData: string | EditorData): void
   getEditorHtml(): Promise<string>
   handleImageUpload(event: Event, fieldKey: string): Promise<void>
+  handleImageListUpload(event: Event, fieldKey: string): Promise<void>
+  uploadImageTo(event: Event, assign: (url: string) => void): Promise<void>
   handleFileUpload(event: Event, fieldKey: string): Promise<void>
+  ensureFieldDefaults(): void
+  initFieldEditors(): void
+  destroyFieldEditors(): void
+  saveFieldEditors(): Promise<void>
   handleFaviconUpload(event: Event): Promise<void>
   removeFavicon(): Promise<void>
   handleLogoUpload(event: Event): Promise<void>

@@ -145,6 +145,8 @@ export function createInitialState(): Partial<CmsComponent> & ThisType<CmsCompon
 
     // エディタ
     editor: null,
+    // richtext カスタムフィールド用の Editor.js インスタンス（field.key 別）
+    fieldEditors: {},
 
     // リビジョン
     revisions: [],

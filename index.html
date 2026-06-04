@@ -499,7 +499,7 @@
                                   ></textarea>
                                 </template>
                                 <template x-if="field.type === 'richtext'">
-                                  <div id="editorjs" class="gh-editorjs"></div>
+                                  <div :id="'editorjs-f-' + field.key" class="gh-editorjs"></div>
                                 </template>
                                 <template x-if="field.type === 'number'">
                                   <input
@@ -716,7 +716,7 @@
                                         type="file"
                                         accept="image/*"
                                         multiple
-                                        @change="for(const f of $event.target.files){handleImageUpload({target:{files:[f]}}, '__tmp');editData[field.key]=[...(editData[field.key]||[]),editData.__tmp];delete editData.__tmp}"
+                                        @change="handleImageListUpload($event, field.key)"
                                       />
                                     </label>
                                   </div>
@@ -833,18 +833,58 @@
                                 </template>
                                 <!-- group -->
                                 <template x-if="field.type === 'group'">
-                                  <details
-                                    class="border border-[var(--ds-border-default)] rounded-md"
-                                    open
+                                  <div
+                                    class="border border-[var(--ds-border-default)] rounded-md p-3 space-y-3"
                                   >
-                                    <summary
-                                      class="px-3 py-2 text-sm font-medium cursor-pointer bg-[var(--ds-bg-muted)]"
-                                      x-text="field.label"
-                                    ></summary>
-                                    <div class="p-3 text-xs text-[var(--ds-text-muted)]">
-                                      グループフィールドはJSONで直接編集してください
-                                    </div>
-                                  </details>
+                                    <template x-for="sf in (field.subFields || [])" :key="sf.key">
+                                      <div>
+                                        <label
+                                          class="text-xs text-[var(--ds-text-muted)]"
+                                          x-text="sf.label || sf.key"
+                                        ></label>
+                                        <template x-if="sf.type === 'textarea'">
+                                          <textarea
+                                            x-model="editData[field.key][sf.key]"
+                                            rows="2"
+                                            class="gh-input-light w-full text-sm"
+                                          ></textarea>
+                                        </template>
+                                        <template x-if="sf.type === 'image'">
+                                          <div>
+                                            <template x-if="editData[field.key][sf.key]">
+                                              <img
+                                                :src="editData[field.key][sf.key]"
+                                                class="max-h-20 rounded border border-[var(--ds-border-default)] mb-1"
+                                              />
+                                            </template>
+                                            <label class="ds-file-button">
+                                              <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                                              <span
+                                                x-text="editData[field.key][sf.key] ? '画像を変更' : '画像を選択'"
+                                              ></span>
+                                              <input
+                                                type="file"
+                                                accept="image/*"
+                                                @change="uploadImageTo($event, (url) => { editData[field.key][sf.key] = url })"
+                                              />
+                                            </label>
+                                          </div>
+                                        </template>
+                                        <template x-if="!['textarea','image'].includes(sf.type)">
+                                          <input
+                                            :type="sf.type === 'number' ? 'number' : sf.type === 'url' ? 'url' : sf.type === 'email' ? 'email' : sf.type === 'date' ? 'date' : 'text'"
+                                            x-model="editData[field.key][sf.key]"
+                                            class="gh-input-light w-full text-sm"
+                                          />
+                                        </template>
+                                      </div>
+                                    </template>
+                                    <template x-if="!(field.subFields && field.subFields.length)">
+                                      <p class="text-xs text-[var(--ds-text-muted)]">
+                                        サブフィールドが未設定です。「フィールド」画面でこのグループにサブフィールドを追加してください。
+                                      </p>
+                                    </template>
+                                  </div>
                                 </template>
                                 <!-- relation -->
                                 <template x-if="field.type === 'relation'">
@@ -1301,7 +1341,7 @@
                                   ></textarea>
                                 </template>
                                 <template x-if="field.type === 'richtext'">
-                                  <div id="editorjs" class="gh-editorjs"></div>
+                                  <div :id="'editorjs-f-' + field.key" class="gh-editorjs"></div>
                                 </template>
                                 <template x-if="field.type === 'number'">
                                   <input
@@ -1518,7 +1558,7 @@
                                         type="file"
                                         accept="image/*"
                                         multiple
-                                        @change="for(const f of $event.target.files){handleImageUpload({target:{files:[f]}}, '__tmp');editData[field.key]=[...(editData[field.key]||[]),editData.__tmp];delete editData.__tmp}"
+                                        @change="handleImageListUpload($event, field.key)"
                                       />
                                     </label>
                                   </div>
@@ -1635,18 +1675,58 @@
                                 </template>
                                 <!-- group -->
                                 <template x-if="field.type === 'group'">
-                                  <details
-                                    class="border border-[var(--ds-border-default)] rounded-md"
-                                    open
+                                  <div
+                                    class="border border-[var(--ds-border-default)] rounded-md p-3 space-y-3"
                                   >
-                                    <summary
-                                      class="px-3 py-2 text-sm font-medium cursor-pointer bg-[var(--ds-bg-muted)]"
-                                      x-text="field.label"
-                                    ></summary>
-                                    <div class="p-3 text-xs text-[var(--ds-text-muted)]">
-                                      グループフィールドはJSONで直接編集してください
-                                    </div>
-                                  </details>
+                                    <template x-for="sf in (field.subFields || [])" :key="sf.key">
+                                      <div>
+                                        <label
+                                          class="text-xs text-[var(--ds-text-muted)]"
+                                          x-text="sf.label || sf.key"
+                                        ></label>
+                                        <template x-if="sf.type === 'textarea'">
+                                          <textarea
+                                            x-model="editData[field.key][sf.key]"
+                                            rows="2"
+                                            class="gh-input-light w-full text-sm"
+                                          ></textarea>
+                                        </template>
+                                        <template x-if="sf.type === 'image'">
+                                          <div>
+                                            <template x-if="editData[field.key][sf.key]">
+                                              <img
+                                                :src="editData[field.key][sf.key]"
+                                                class="max-h-20 rounded border border-[var(--ds-border-default)] mb-1"
+                                              />
+                                            </template>
+                                            <label class="ds-file-button">
+                                              <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                                              <span
+                                                x-text="editData[field.key][sf.key] ? '画像を変更' : '画像を選択'"
+                                              ></span>
+                                              <input
+                                                type="file"
+                                                accept="image/*"
+                                                @change="uploadImageTo($event, (url) => { editData[field.key][sf.key] = url })"
+                                              />
+                                            </label>
+                                          </div>
+                                        </template>
+                                        <template x-if="!['textarea','image'].includes(sf.type)">
+                                          <input
+                                            :type="sf.type === 'number' ? 'number' : sf.type === 'url' ? 'url' : sf.type === 'email' ? 'email' : sf.type === 'date' ? 'date' : 'text'"
+                                            x-model="editData[field.key][sf.key]"
+                                            class="gh-input-light w-full text-sm"
+                                          />
+                                        </template>
+                                      </div>
+                                    </template>
+                                    <template x-if="!(field.subFields && field.subFields.length)">
+                                      <p class="text-xs text-[var(--ds-text-muted)]">
+                                        サブフィールドが未設定です。「フィールド」画面でこのグループにサブフィールドを追加してください。
+                                      </p>
+                                    </template>
+                                  </div>
                                 </template>
                                 <!-- relation -->
                                 <template x-if="field.type === 'relation'">
@@ -2584,7 +2664,7 @@
                                         </button>
                                       </div>
                                     </template>
-                                    <template x-if="f.type === 'repeater'">
+                                    <template x-if="['repeater', 'group'].includes(f.type)">
                                       <div>
                                         <label
                                           class="text-xs text-[var(--ds-text-muted)] font-medium"

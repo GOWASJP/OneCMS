@@ -84,10 +84,20 @@ export const contentTypesMixin: Partial<CmsComponent> & ThisType<CmsComponent> =
           note: 'リッチテキスト（HTML 出力）',
         })
       } else if (f.type === 'repeater') {
+        const inner = ((f as any).subFields || []).map((sf: any) => `  {{${sf.key}}}`).join('\n')
         result.push({
           label: f.label,
-          code: `{{#each page.${f.key}}}\n  <!-- 各要素 -->\n{{/each}}`,
+          code: `{{#each page.${f.key}}}\n${inner || '  <!-- 各要素 -->'}\n{{/each}}`,
           note: 'リピーター（配列）',
+        })
+      } else if (f.type === 'group') {
+        const inner = ((f as any).subFields || [])
+          .map((sf: any) => `  {{page.${f.key}.${sf.key}}}`)
+          .join('\n')
+        result.push({
+          label: f.label,
+          code: inner || `{{page.${f.key}}}`,
+          note: 'グループ（オブジェクト）',
         })
       } else if (f.type === 'relation') {
         result.push({
@@ -293,9 +303,9 @@ export const contentTypesMixin: Partial<CmsComponent> & ThisType<CmsComponent> =
     if (['select', 'multiselect', 'radio'].includes(id) && (!f.options || !f.options.length)) {
       f.options = ['']
     }
-    if (id === 'repeater' && !f.subFields) f.subFields = []
+    if (['repeater', 'group'].includes(id) && !f.subFields) f.subFields = []
     // 選択肢・サブフィールドの設定が必要なタイプは詳細を自動展開して気づけるようにする
-    if (['select', 'multiselect', 'radio', 'repeater'].includes(id)) f._expanded = true
+    if (['select', 'multiselect', 'radio', 'repeater', 'group'].includes(id)) f._expanded = true
     this.typePickerTarget = null
   },
 

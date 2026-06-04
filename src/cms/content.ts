@@ -42,11 +42,7 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     this.showPreviewPanel = false
     this.view = 'page-edit'
     this.editData = { ...page }
-    for (const f of this.currentFields) {
-      if (['relation', 'repeater', 'imagelist', 'multiselect'].includes(f.type)) {
-        ;(this.editData as any)[f.key] = []
-      }
-    }
+    this.ensureFieldDefaults()
     this.initEditor('')
     this.updateHash()
     this.$nextTick(() => {
@@ -88,16 +84,8 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     this.showPreviewPanel = false
     this.view = 'page-edit'
     this.editData = { slug: '', category: '', tags: [], ...page }
-    // relation / repeater / imagelist / multiselect フィールドが未初期化の場合は空配列を注入
-    for (const f of this.currentFields) {
-      if (
-        (['relation', 'repeater', 'imagelist', 'multiselect'].includes(f.type) &&
-          (this.editData as any)[f.key] === undefined) ||
-        (this.editData as any)[f.key] === null
-      ) {
-        ;(this.editData as any)[f.key] = []
-      }
-    }
+    // カスタムフィールドの初期値（配列系は []、group はオブジェクト）を注入
+    this.ensureFieldDefaults()
     // フロントページも通常ページと同じ扱い（特別扱いしない）。本文エディタは常に有効。
     this.initEditor((page as any)._editorJson || page.body || '')
     this.updateHash()
@@ -151,16 +139,8 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     this.showPreviewPanel = false
     this.view = 'content-edit'
     this.editData = { slug: '', category: '', tags: [], ...data }
-    // 配列系フィールドの初期化
-    for (const f of this.currentFields) {
-      if (
-        (['relation', 'repeater', 'imagelist', 'multiselect'].includes(f.type) &&
-          (this.editData as any)[f.key] === undefined) ||
-        (this.editData as any)[f.key] === null
-      ) {
-        ;(this.editData as any)[f.key] = []
-      }
-    }
+    // カスタムフィールドの初期値（配列系は []、group はオブジェクト）を注入
+    this.ensureFieldDefaults()
     // Alpine template x-if の入れ子展開を待つ
     setTimeout(() => {
       // 本文は全タイプ共通の既定項目なので常に初期化
@@ -194,6 +174,7 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     this.currentPage = item
     this.currentFields = this.currentType ? this.fieldsForType(this.currentType) : []
     this.editData = { ...item }
+    this.ensureFieldDefaults()
     this.view = 'content-edit'
     setTimeout(() => {
       // 本文は全タイプ共通の既定項目なので常に初期化
@@ -226,13 +207,18 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
         if (this.suppressDirty) return
         this.markDirty()
       })
+      // カスタムの richtext フィールド用エディタも同じ抑制ウィンドウ内で初期化。
+      // x-for（フィールドグループのセクション）の DOM 展開を確実に待つため少し遅延させる。
+      window.setTimeout(() => this.initFieldEditors(), 60)
       window.setTimeout(() => {
         this.suppressDirty = false
-      }, 200)
+      }, 250)
     })
   },
 
   async getEditorHtml(): Promise<string> {
+    // richtext カスタムフィールドの内容も毎回 editData へ反映（保存/プレビュー/書き出し共通経路）
+    await this.saveFieldEditors()
     if (!this.editor) return this.editData.body || ''
     const outputData = await this.editor.save()
     // Editor.js JSONをbody_jsonとして保存し、HTMLも生成
@@ -262,6 +248,48 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     }
   },
 
+  /** 画像リスト（imagelist）への追加アップロード。
+   *  handleImageUpload は async なので、選択した各ファイルを await して
+   *  順番に配列へ push する（旧実装は await せず undefined を詰めていた）。 */
+  async handleImageListUpload(event: Event, fieldKey: string) {
+    const input = event.target as HTMLInputElement
+    const files = input.files ? Array.from(input.files) : []
+    if (!files.length || !this.fs) return
+    if (!Array.isArray(this.editData[fieldKey])) this.editData[fieldKey] = []
+    let optimized = 0
+    for (const file of files) {
+      try {
+        const result = await saveImage(this.fs, file)
+        ;(this.editData[fieldKey] as string[]).push(result.blobUrl || `/${result.path}`)
+        optimized++
+      } catch (e) {
+        console.error('画像最適化エラー:', e)
+      }
+    }
+    // 同じ input で再度同じファイルを選べるようにクリア
+    input.value = ''
+    if (optimized) this.showToast(`${optimized}枚の画像を追加しました`)
+    else this.showToast('画像の処理に失敗しました')
+    this.markDirty()
+  },
+
+  /** group のサブフィールド画像など、対象キーへ1枚アップロードして代入する汎用ヘルパー。
+   *  代入先を呼び出し側のコールバックで指定する（ネストしたパスに対応）。 */
+  async uploadImageTo(event: Event, assign: (url: string) => void) {
+    const input = event.target as HTMLInputElement
+    const file = input.files?.[0]
+    if (!file || !this.fs) return
+    try {
+      const result = await saveImage(this.fs, file)
+      assign(result.blobUrl || `/${result.path}`)
+      input.value = ''
+      this.markDirty()
+    } catch (e) {
+      console.error('画像最適化エラー:', e)
+      this.showToast('画像の処理に失敗しました')
+    }
+  },
+
   async handleFileUpload(event: Event, fieldKey: string) {
     const input = event.target as HTMLInputElement
     const file = input.files?.[0]
@@ -278,15 +306,75 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     }
   },
 
+  /** カスタムフィールドの初期値を editData に注入。
+   *  - 配列系（relation/repeater/imagelist/multiselect）: 未定義なら []
+   *  - group: オブジェクト化し、各サブフィールドキーを '' で初期化 */
+  ensureFieldDefaults() {
+    for (const f of this.currentFields || []) {
+      const cur = (this.editData as any)[f.key]
+      if (['relation', 'repeater', 'imagelist', 'multiselect'].includes(f.type)) {
+        if (cur === undefined || cur === null) (this.editData as any)[f.key] = []
+      } else if (f.type === 'group') {
+        const obj = cur && typeof cur === 'object' && !Array.isArray(cur) ? cur : {}
+        for (const sf of (f as any).subFields || []) {
+          if (obj[sf.key] === undefined) obj[sf.key] = ''
+        }
+        ;(this.editData as any)[f.key] = obj
+      }
+    }
+  },
+
+  // --- リッチテキストのカスタムフィールド（本文とは別の Editor.js インスタンス） ---
+
+  /** currentFields の richtext フィールドごとに、一意 holder の Editor.js を生成。
+   *  本文(this.editor)とは別管理。holder が DOM に無い場合はスキップ。 */
+  initFieldEditors() {
+    this.destroyFieldEditors()
+    for (const f of this.currentFields || []) {
+      if (f.type !== 'richtext') continue
+      const holder = `editorjs-f-${f.key}`
+      if (!document.getElementById(holder)) continue
+      const html = (this.editData as any)[f.key]
+      const data = typeof html === 'string' && html.trim() ? htmlToEditorJson(html) : null
+      this.fieldEditors[f.key] = createEditor(holder, data, this.fs, () => {
+        if (this.suppressDirty) return
+        this.markDirty()
+      })
+    }
+  },
+
+  destroyFieldEditors() {
+    for (const key of Object.keys(this.fieldEditors)) {
+      try {
+        this.fieldEditors[key].destroy()
+      } catch {
+        /* skip */
+      }
+      delete this.fieldEditors[key]
+    }
+  },
+
+  /** richtext カスタムフィールドの内容を editData[key] へ HTML として保存 */
+  async saveFieldEditors() {
+    for (const key of Object.keys(this.fieldEditors)) {
+      try {
+        const out = await this.fieldEditors[key].save()
+        ;(this.editData as any)[key] = editorJsonToHtml(out as EditorData)
+      } catch {
+        /* skip */
+      }
+    }
+  },
+
   // --- 保存（リビジョン自動作成付き） ---
 
   async savePage(opts: { silent?: boolean } = {}) {
     if (!this.fs) return
     const silent = opts.silent === true
-    // Editor.jsの内容を先に取得（バリデーション前に必要）
-    if (this.editor) {
-      this.editData.body = await this.getEditorHtml()
-    }
+    // Editor.jsの内容を先に取得（バリデーション前に必要）。
+    // getEditorHtml 内で richtext カスタムフィールドも editData へ反映される。
+    const bodyHtml = await this.getEditorHtml()
+    if (this.editor) this.editData.body = bodyHtml
     // 必須フィールドバリデーション
     if (!this.editData.title?.trim()) {
       if (!silent) this.showToast('タイトルを入力してください')
