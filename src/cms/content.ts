@@ -2,7 +2,7 @@
 import type { CmsComponent } from './types.ts'
 import { type ContentData, type ContentType, type FieldDefinition } from '../types.ts'
 import { createEditor, editorJsonToHtml, htmlToEditorJson, type EditorData } from '../editor.ts'
-import { saveImage } from '../image.ts'
+import { saveImage, safeAssetFilename } from '../image.ts'
 import { PATH_ASSETS_FILES } from '../constants.ts'
 
 export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
@@ -296,7 +296,9 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     if (!file || !this.fs) return
     try {
       const buffer = await file.arrayBuffer()
-      const path = `${PATH_ASSETS_FILES}/${file.name}`
+      // 日本語等の非ASCIIファイル名は文字化けの原因になるため安全な名前へ正規化
+      const safeName = safeAssetFilename(file.name)
+      const path = `${PATH_ASSETS_FILES}/${safeName}`
       await this.fs.writeBlob(path, new Blob([buffer]))
       this.editData[fieldKey] = `/${path}`
       this.showToast(`${file.name} をアップロードしました`)
