@@ -11,6 +11,8 @@ import { APP_NAME } from './constants.ts'
 import type { CmsComponent } from './cms/types.ts'
 import { createInitialState } from './cms/state.ts'
 import { coreMixin } from './cms/core.ts'
+import { setupMixin } from './cms/setup.ts'
+import { assetsMixin } from './cms/assets.ts'
 import { contentMixin } from './cms/content.ts'
 import { contentTypesMixin } from './cms/content-types.ts'
 import { structureMixin } from './cms/structure.ts'
@@ -30,6 +32,8 @@ Alpine.data('cms', () => {
   const component: CmsComponent & ThisType<CmsComponent> = {
     ...createInitialState(),
     ...coreMixin,
+    ...setupMixin,
+    ...assetsMixin,
     ...contentMixin,
     ...contentTypesMixin,
     ...structureMixin,
