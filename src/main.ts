@@ -54,7 +54,7 @@ Alpine.data('cms', () => {
       if (this.view === 'content-list' && this.currentType) return this.currentType.label
       if (this.view === 'page-list') return 'ページ'
       if (this.view === 'site-info') return 'サイト情報'
-      if (this.view === 'settings') return '設定'
+      if (this.view === 'settings') return 'システム設定'
       if (this.view === 'templates') return 'テーマ開発'
       if (this.view === 'themes') return 'テーマ'
       if (this.view === 'field-groups') return 'フィールド'
