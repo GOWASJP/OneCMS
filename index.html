@@ -33,7 +33,7 @@
             autofocus
           />
           <button @click="setAuthor()" :disabled="!authorInput.trim()" class="gh-btn-green w-full">
-            開始する
+            <span x-text="t('btn.start')"></span>
           </button>
         </div>
       </div>
@@ -306,7 +306,7 @@
                     class="hover:text-[var(--ds-text-heading)] cursor-pointer"
                     @click="loadPageList()"
                   >
-                    ページ
+                    <span x-text="t('nav.pages')"></span>
                   </span>
                   <i data-lucide="chevron-right" class="w-3 h-3"></i>
                   <span
@@ -429,14 +429,14 @@
                       <i data-lucide="folder-open" class="w-7 h-7"></i>
                     </div>
                     <h2 class="text-lg font-bold text-[var(--ds-text-heading)] mb-2">
-                      サイトフォルダを選択
+                      <span x-text="t('welcome.selectFolder')"></span>
                     </h2>
                     <p class="text-sm text-[var(--ds-text-muted)] mb-4 leading-relaxed">
-                      サイトのデータが保存されているフォルダ（または新しい空のフォルダ）を選んでください。初回はフォルダ内に必要なファイルが自動で生成されます。
+                      <span x-text="t('welcome.folderNote')"></span>
                     </p>
                     <button @click="selectFolder()" class="gh-btn-green text-sm px-6 py-2.5">
                       <i data-lucide="folder-open" class="w-4 h-4"></i>
-                      フォルダを選択
+                      <span x-text="t('welcome.selectFolderBtn')"></span>
                     </button>
                     <p class="text-[11px] text-[var(--ds-text-muted)] mt-4 leading-snug">
                       ※
@@ -631,7 +631,7 @@
                                         @click="editData[field.key] = ''"
                                         class="text-xs text-[var(--ds-danger-600)] hover:underline"
                                       >
-                                        削除
+                                        <span x-text="t('btn.delete')"></span>
                                       </button>
                                     </div>
                                   </div>
@@ -848,7 +848,7 @@
                                           @click="const empty = {}; field.subFields.forEach(sf => empty[sf.key] = ''); editData[field.key] = [...(editData[field.key]||[]), empty]"
                                           class="gh-btn-outline text-xs"
                                         >
-                                          + 追加
+                                          <span x-text="t('btn.add')"></span>
                                         </button>
                                       </div>
                                     </template>
@@ -869,7 +869,7 @@
                                               @click="editData[field.key].splice(idx,1)"
                                               class="text-[var(--ds-danger-600)] text-xs"
                                             >
-                                              削除
+                                              <span x-text="t('btn.delete')"></span>
                                             </button>
                                           </div>
                                         </template>
@@ -877,7 +877,7 @@
                                           @click="editData[field.key] = [...(editData[field.key]||[]), '']"
                                           class="gh-btn-outline text-xs"
                                         >
-                                          + 追加
+                                          <span x-text="t('btn.add')"></span>
                                         </button>
                                       </div>
                                     </template>
@@ -933,7 +933,7 @@
                                     </template>
                                     <template x-if="!(field.subFields && field.subFields.length)">
                                       <p class="text-xs text-[var(--ds-text-muted)]">
-                                        サブフィールドが未設定です。「フィールド」画面でこのグループにサブフィールドを追加してください。
+                                        <span x-text="t('fields.subfieldEmpty')"></span>
                                       </p>
                                     </template>
                                   </div>
@@ -974,7 +974,7 @@
                                           <p
                                             class="text-xs text-[var(--ds-text-muted)] py-2 text-center"
                                           >
-                                            該当するコンテンツがありません
+                                            <span x-text="t('relation.noContent')"></span>
                                           </p>
                                         </template>
                                       </div>
@@ -1191,7 +1191,7 @@
                     <div class="flex-1"></div>
                     <button @click="createPage()" class="gh-btn-green text-[13px]">
                       <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                      新規作成
+                      <span x-text="t('btn.new')"></span>
                     </button>
                   </div>
                   <div class="space-y-1">
@@ -1218,7 +1218,7 @@
                                 class="shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-[var(--ds-primary-600)] text-white"
                                 :title="t('title.frontPage')"
                               >
-                                フロントページ
+                                <span x-text="t('site.frontPage')"></span>
                               </span>
                             </template>
                           </p>
@@ -1240,7 +1240,7 @@
                     </template>
                     <template x-if="pages.length === 0">
                       <div class="py-16 text-center text-sm text-[var(--ds-text-placeholder)]">
-                        ページがありません
+                        <span x-text="t('page.none')"></span>
                       </div>
                     </template>
                   </div>
@@ -1276,7 +1276,7 @@
                     </button>
                     <button @click="createContent()" class="gh-btn-green text-[13px]">
                       <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                      新規作成
+                      <span x-text="t('btn.new')"></span>
                     </button>
                   </div>
                   <div class="space-y-1">
@@ -1308,7 +1308,7 @@
                     </template>
                     <template x-if="contentItems.length === 0">
                       <div class="py-16 text-center text-sm text-[var(--ds-text-placeholder)]">
-                        コンテンツがありません
+                        <span x-text="t('content.none')"></span>
                       </div>
                     </template>
                     <template x-if="contentItems.length > contentPerPage">
@@ -1318,7 +1318,7 @@
                           :disabled="contentPage <= 1"
                           class="gh-btn-outline disabled:opacity-40 disabled:cursor-not-allowed"
                         >
-                          前へ
+                          <span x-text="t('pager.prev')"></span>
                         </button>
                         <span class="text-[var(--ds-text-muted)]">
                           <span x-text="contentPage"></span>
@@ -1330,7 +1330,7 @@
                           :disabled="contentPage >= Math.ceil(contentItems.length / contentPerPage)"
                           class="gh-btn-outline disabled:opacity-40 disabled:cursor-not-allowed"
                         >
-                          次へ
+                          <span x-text="t('pager.next')"></span>
                         </button>
                       </div>
                     </template>
@@ -1498,7 +1498,7 @@
                                         @click="editData[field.key] = ''"
                                         class="text-xs text-[var(--ds-danger-600)] hover:underline"
                                       >
-                                        削除
+                                        <span x-text="t('btn.delete')"></span>
                                       </button>
                                     </div>
                                   </div>
@@ -1715,7 +1715,7 @@
                                           @click="const empty = {}; field.subFields.forEach(sf => empty[sf.key] = ''); editData[field.key] = [...(editData[field.key]||[]), empty]"
                                           class="gh-btn-outline text-xs"
                                         >
-                                          + 追加
+                                          <span x-text="t('btn.add')"></span>
                                         </button>
                                       </div>
                                     </template>
@@ -1736,7 +1736,7 @@
                                               @click="editData[field.key].splice(idx,1)"
                                               class="text-[var(--ds-danger-600)] text-xs"
                                             >
-                                              削除
+                                              <span x-text="t('btn.delete')"></span>
                                             </button>
                                           </div>
                                         </template>
@@ -1744,7 +1744,7 @@
                                           @click="editData[field.key] = [...(editData[field.key]||[]), '']"
                                           class="gh-btn-outline text-xs"
                                         >
-                                          + 追加
+                                          <span x-text="t('btn.add')"></span>
                                         </button>
                                       </div>
                                     </template>
@@ -1800,7 +1800,7 @@
                                     </template>
                                     <template x-if="!(field.subFields && field.subFields.length)">
                                       <p class="text-xs text-[var(--ds-text-muted)]">
-                                        サブフィールドが未設定です。「フィールド」画面でこのグループにサブフィールドを追加してください。
+                                        <span x-text="t('fields.subfieldEmpty')"></span>
                                       </p>
                                     </template>
                                   </div>
@@ -1841,7 +1841,7 @@
                                           <p
                                             class="text-xs text-[var(--ds-text-muted)] py-2 text-center"
                                           >
-                                            該当するコンテンツがありません
+                                            <span x-text="t('relation.noContent')"></span>
                                           </p>
                                         </template>
                                       </div>
@@ -2032,11 +2032,11 @@
                     <button
                       type="button"
                       x-show="(exportResult?.changedPaths || []).length"
-                      @click="navigator.clipboard.writeText((exportResult?.changedPaths || []).join('\n')); showToast('ファイル一覧をコピーしました')"
+                      @click="navigator.clipboard.writeText((exportResult?.changedPaths || []).join('\n')); showToast(t('toast.copiedList'))"
                       class="text-xs text-[var(--ds-primary-600)] hover:underline inline-flex items-center gap-1"
                     >
                       <i data-lucide="copy" class="w-3 h-3"></i>
-                      一覧をコピー
+                      <span x-text="t('btn.copyList')"></span>
                     </button>
                   </div>
                   <template x-if="(exportResult?.changedPaths || []).length">
@@ -2058,7 +2058,7 @@
                     <p
                       class="text-sm text-[var(--ds-text-muted)] border border-dashed border-[var(--ds-border-default)] rounded-lg px-3 py-4 text-center"
                     >
-                      前回から更新されたファイルはありません。
+                      <span x-text="t('export.noChanges')"></span>
                     </p>
                   </template>
                 </div>
@@ -2085,7 +2085,7 @@
                 >
                   <p class="text-sm font-semibold mb-2 flex items-center gap-1.5">
                     <i data-lucide="upload" class="w-4 h-4"></i>
-                    アップロード手順
+                    <span x-text="t('export.uploadSteps')"></span>
                   </p>
                   <ol class="list-decimal list-inside space-y-1 text-sm text-[var(--ds-text-body)]">
                     <li>
@@ -2136,7 +2136,7 @@
                     <h3
                       class="text-xs font-bold text-[var(--ds-text-muted)] uppercase tracking-wider mb-2"
                     >
-                      メニュー
+                      <span x-text="t('nav.menus')"></span>
                     </h3>
                     <div class="space-y-0.5 mb-4">
                       <template x-for="m in menuData.menus" :key="m.id">
@@ -2155,13 +2155,13 @@
                         <h3
                           class="text-xs font-bold text-[var(--ds-text-muted)] uppercase tracking-wider mb-1"
                         >
-                          項目追加
+                          <span x-text="t('menu.addItem')"></span>
                         </h3>
                         <details class="border border-[var(--ds-border-default)] rounded-md" open>
                           <summary
                             class="px-3 py-2 text-xs font-semibold text-[var(--ds-text-muted)] bg-[var(--ds-bg-surface)] rounded-t-md"
                           >
-                            固定ページ
+                            <span x-text="t('loc.page')"></span>
                           </summary>
                           <div class="p-2 space-y-0.5 max-h-32 overflow-y-auto">
                             <template x-for="p in pages" :key="p.id">
@@ -2177,7 +2177,7 @@
                           <summary
                             class="px-3 py-2 text-xs font-semibold text-[var(--ds-text-muted)] bg-[var(--ds-bg-surface)] rounded-t-md"
                           >
-                            投稿タイプ
+                            <span x-text="t('loc.contentType')"></span>
                           </summary>
                           <div class="p-2 space-y-0.5 max-h-32 overflow-y-auto">
                             <template x-for="t in contentTypes" :key="t.id">
@@ -2193,7 +2193,7 @@
                           <summary
                             class="px-3 py-2 text-xs font-semibold text-[var(--ds-text-muted)] bg-[var(--ds-bg-surface)] rounded-t-md"
                           >
-                            カテゴリ
+                            <span x-text="t('nav.categories')"></span>
                           </summary>
                           <div class="p-2 space-y-0.5 max-h-32 overflow-y-auto">
                             <template x-for="cat in availableCategories" :key="cat.id">
@@ -2205,7 +2205,7 @@
                             </template>
                             <template x-if="!availableCategories.length">
                               <p class="text-xs text-[var(--ds-text-placeholder)] px-2">
-                                カテゴリなし
+                                <span x-text="t('menu.noCategory')"></span>
                               </p>
                             </template>
                           </div>
@@ -2214,14 +2214,14 @@
                           <summary
                             class="px-3 py-2 text-xs font-semibold text-[var(--ds-text-muted)] bg-[var(--ds-bg-surface)] rounded-t-md"
                           >
-                            カスタムリンク
+                            <span x-text="t('menu.customLink')"></span>
                           </summary>
                           <div class="p-2">
                             <button
                               @click="addMenuItem('custom', '', '', '')"
                               class="gh-btn-outline text-xs w-full"
                             >
-                              + 追加
+                              <span x-text="t('btn.add')"></span>
                             </button>
                           </div>
                         </details>
@@ -2231,7 +2231,7 @@
                   <div class="p-3 border-t border-[var(--ds-border-default)]">
                     <button @click="addMenu()" class="gh-btn-green text-xs w-full">
                       <i data-lucide="plus" class="w-3 h-3"></i>
-                      新規メニュー
+                      <span x-text="t('menu.new')"></span>
                     </button>
                   </div>
                 </div>
@@ -2250,7 +2250,7 @@
                           @click="deleteMenu()"
                           class="text-[var(--ds-danger-600)] text-xs hover:underline mr-2"
                         >
-                          削除
+                          <span x-text="t('btn.delete')"></span>
                         </button>
                         <button
                           @click="saveMenus()"
@@ -2272,7 +2272,7 @@
                         <div>
                           <h3 class="text-sm font-bold mb-2" x-text="t('menu.structure')"></h3>
                           <p class="text-xs text-[var(--ds-text-placeholder)] mb-3">
-                            ドラッグまたは矢印ボタンで並び替え。
+                            <span x-text="t('menu.reorderNote')"></span>
                           </p>
 
                           <div
@@ -2334,7 +2334,7 @@
                                       @click="removeMenuItem(idx)"
                                       class="text-[var(--ds-danger-600)] text-xs hover:underline shrink-0 px-2 py-1.5 -mr-2 rounded hover:bg-red-50"
                                     >
-                                      削除
+                                      <span x-text="t('btn.delete')"></span>
                                     </button>
                                   </div>
                                   <div class="flex items-center gap-2 pl-6">
@@ -2364,7 +2364,7 @@
                                           @change="item.target = $event.target.checked ? '_blank' : ''"
                                           class="accent-[var(--ds-primary-600)]"
                                         />
-                                        新しいタブ
+                                        <span x-text="t('menu.newTab')"></span>
                                       </label>
                                     </div>
                                   </template>
@@ -2375,7 +2375,7 @@
                               <div
                                 class="py-12 text-center text-sm text-[var(--ds-text-placeholder)] border border-dashed border-[var(--ds-border-default)] rounded-md"
                               >
-                                左のパネルから項目を追加してください
+                                <span x-text="t('menu.addFromPanel')"></span>
                               </div>
                             </template>
                           </div>
@@ -2385,11 +2385,11 @@
                         <div class="border-t border-[var(--ds-border-default)] pt-4">
                           <h3 class="text-sm font-bold mb-2" x-text="t('tpl.code')"></h3>
                           <p class="text-xs text-[var(--ds-text-muted)] mb-3">
-                            テンプレートに以下のコードを貼り付けてこのメニューを表示できます。
+                            <span x-text="t('menu.templateNote')"></span>
                           </p>
                           <div
                             class="bg-[var(--ds-bg-muted)] border border-[var(--ds-border-default)] rounded-md p-3 cursor-pointer relative group overflow-x-auto"
-                            @click="navigator.clipboard.writeText($el.querySelector('pre').textContent); showToast('コピーしました')"
+                            @click="navigator.clipboard.writeText($el.querySelector('pre').textContent); showToast(t('toast.copied'))"
                           >
                             <pre
                               class="font-mono text-xs text-[var(--ds-text-heading)] select-all m-0"
@@ -2398,7 +2398,7 @@
                             <span
                               class="absolute top-2 right-2 text-[var(--ds-text-muted)] opacity-0 group-hover:opacity-100 transition-opacity text-xs"
                             >
-                              クリックでコピー
+                              <span x-text="t('common.clickToCopy')"></span>
                             </span>
                           </div>
                         </div>
@@ -2408,7 +2408,7 @@
                   <template x-if="!currentMenu">
                     <div class="flex-1 flex items-center justify-center h-full">
                       <p class="text-sm text-[var(--ds-text-muted)]">
-                        メニューを選択または新規作成
+                        <span x-text="t('menu.selectOrNew')"></span>
                       </p>
                     </div>
                   </template>
@@ -2430,7 +2430,7 @@
                     ></button>
                   </div>
                   <p class="text-xs text-[var(--ds-text-muted)] mb-4">
-                    記事に割り当てるカテゴリを管理します。スラッグはURLに使用されます。
+                    <span x-text="t('taxo.categoryNote')"></span>
                   </p>
                   <div class="space-y-2">
                     <template x-for="(cat, idx) in taxonomyData.categories" :key="cat.id">
@@ -2465,7 +2465,7 @@
                           @click="taxonomyData.categories.splice(idx,1)"
                           class="text-[var(--ds-danger-600)] text-xs hover:underline px-2 pt-4"
                         >
-                          削除
+                          <span x-text="t('btn.delete')"></span>
                         </button>
                       </div>
                     </template>
@@ -2474,14 +2474,14 @@
                     @click="taxonomyData.categories.push({id:Date.now().toString(), label:'', slug:''})"
                     class="gh-btn-outline text-xs mt-3"
                   >
-                    + カテゴリ追加
+                    <span x-text="t('taxo.addCategory')"></span>
                   </button>
 
                   <!-- テンプレートコード -->
                   <div class="border-t border-[var(--ds-border-default)] mt-6 pt-4">
                     <h3 class="text-sm font-bold mb-2" x-text="t('tpl.code')"></h3>
                     <p class="text-xs text-[var(--ds-text-muted)] mb-3">
-                      テンプレートファイルに貼り付けてカテゴリを表示できます。各ブロックをクリックでコピー。
+                      <span x-text="t('taxo.categoryTplNote')"></span>
                     </p>
                     <template x-for="snippet in categorySnippets" :key="snippet.label">
                       <div class="mb-3">
@@ -2491,7 +2491,7 @@
                         ></p>
                         <div
                           class="bg-[var(--ds-bg-muted)] border border-[var(--ds-border-default)] rounded-md p-3 cursor-pointer relative group overflow-x-auto"
-                          @click="navigator.clipboard.writeText(snippet.code); showToast('コピーしました')"
+                          @click="navigator.clipboard.writeText(snippet.code); showToast(t('toast.copied'))"
                         >
                           <pre
                             class="font-mono text-xs text-[var(--ds-text-heading)] select-all m-0 whitespace-pre"
@@ -2500,7 +2500,7 @@
                           <span
                             class="absolute top-2 right-2 text-[var(--ds-text-muted)] opacity-0 group-hover:opacity-100 transition-opacity text-[10px]"
                           >
-                            クリックでコピー
+                            <span x-text="t('common.clickToCopy')"></span>
                           </span>
                         </div>
                       </div>
@@ -2524,7 +2524,7 @@
                     ></button>
                   </div>
                   <p class="text-xs text-[var(--ds-text-muted)] mb-4">
-                    記事に割り当てるタグを管理します。スラッグはURLに使用されます。
+                    <span x-text="t('taxo.tagNote')"></span>
                   </p>
                   <div class="space-y-2">
                     <template x-for="(tag, idx) in taxonomyData.tags" :key="tag.id">
@@ -2559,7 +2559,7 @@
                           @click="taxonomyData.tags.splice(idx,1)"
                           class="text-[var(--ds-danger-600)] text-xs hover:underline px-2 pt-4"
                         >
-                          削除
+                          <span x-text="t('btn.delete')"></span>
                         </button>
                       </div>
                     </template>
@@ -2568,14 +2568,14 @@
                     @click="taxonomyData.tags.push({id:Date.now().toString(), label:'', slug:''})"
                     class="gh-btn-outline text-xs mt-3"
                   >
-                    + タグ追加
+                    <span x-text="t('taxo.addTag')"></span>
                   </button>
 
                   <!-- テンプレートコード -->
                   <div class="border-t border-[var(--ds-border-default)] mt-6 pt-4">
                     <h3 class="text-sm font-bold mb-2" x-text="t('tpl.code')"></h3>
                     <p class="text-xs text-[var(--ds-text-muted)] mb-3">
-                      テンプレートファイルに貼り付けてタグを表示できます。各ブロックをクリックでコピー。
+                      <span x-text="t('taxo.tagTplNote')"></span>
                     </p>
                     <template x-for="snippet in tagSnippets" :key="snippet.label">
                       <div class="mb-3">
@@ -2585,7 +2585,7 @@
                         ></p>
                         <div
                           class="bg-[var(--ds-bg-muted)] border border-[var(--ds-border-default)] rounded-md p-3 cursor-pointer relative group overflow-x-auto"
-                          @click="navigator.clipboard.writeText(snippet.code); showToast('コピーしました')"
+                          @click="navigator.clipboard.writeText(snippet.code); showToast(t('toast.copied'))"
                         >
                           <pre
                             class="font-mono text-xs text-[var(--ds-text-heading)] select-all m-0 whitespace-pre"
@@ -2594,7 +2594,7 @@
                           <span
                             class="absolute top-2 right-2 text-[var(--ds-text-muted)] opacity-0 group-hover:opacity-100 transition-opacity text-[10px]"
                           >
-                            クリックでコピー
+                            <span x-text="t('common.clickToCopy')"></span>
                           </span>
                         </div>
                       </div>
@@ -2615,7 +2615,7 @@
                     <h3
                       class="text-xs font-bold text-[var(--ds-text-muted)] uppercase tracking-wider mb-2"
                     >
-                      フィールドグループ
+                      <span x-text="t('fields.fieldGroups')"></span>
                     </h3>
                     <div class="space-y-0.5">
                       <template x-for="g in fieldGroups" :key="g.id">
@@ -2631,7 +2631,7 @@
                   <div class="p-3 border-t border-[var(--ds-border-default)]">
                     <button @click="createFieldGroup()" class="gh-btn-green text-xs w-full">
                       <i data-lucide="plus" class="w-3 h-3"></i>
-                      新規グループ
+                      <span x-text="t('fields.newGroupBtn')"></span>
                     </button>
                   </div>
                 </div>
@@ -2651,10 +2651,10 @@
                           @click="deleteFieldGroup()"
                           class="text-[var(--ds-danger-600)] text-xs hover:underline mr-2"
                         >
-                          削除
+                          <span x-text="t('btn.delete')"></span>
                         </button>
                         <button @click="saveFieldGroup()" class="gh-btn-green text-[13px]">
-                          保存
+                          <span x-text="t('btn.save')"></span>
                         </button>
                       </div>
 
@@ -2687,7 +2687,7 @@
                             x-text="t('fields.locationRules')"
                           ></h3>
                           <p class="text-xs text-[var(--ds-text-muted)] mb-2">
-                            このグループを表示する編集画面を指定します。いずれかの条件に一致する固定ページ・投稿の編集画面に入力項目が表示されます。
+                            <span x-text="t('fields.locationNote')"></span>
                           </p>
                           <div class="space-y-2">
                             <template
@@ -2703,7 +2703,7 @@
                                     value="page:*"
                                     :selected="loc.target === 'page' && loc.value === '*'"
                                   >
-                                    すべての固定ページ
+                                    <span x-text="t('loc.allPages')"></span>
                                   </option>
                                   <template x-for="p in pages" :key="'pg-' + p.id">
                                     <option
@@ -2716,7 +2716,7 @@
                                     value="contentType:*"
                                     :selected="loc.target === 'contentType' && loc.value === '*'"
                                   >
-                                    すべての投稿タイプ
+                                    <span x-text="t('loc.allTypes')"></span>
                                   </option>
                                   <template x-for="t in contentTypes" :key="'ct-' + t.id">
                                     <option
@@ -2731,7 +2731,7 @@
                                   @click="currentFieldGroup.locations.splice(li, 1)"
                                   class="text-[var(--ds-danger-600)] text-xs hover:underline shrink-0"
                                 >
-                                  削除
+                                  <span x-text="t('btn.delete')"></span>
                                 </button>
                               </div>
                             </template>
@@ -2742,13 +2742,13 @@
                             class="gh-btn-outline text-xs mt-2"
                           >
                             <i data-lucide="plus" class="w-3 h-3"></i>
-                            条件を追加
+                            <span x-text="t('fields.addCondition')"></span>
                           </button>
                           <p
                             x-show="!(currentFieldGroup.locations || []).length"
                             class="text-[11px] text-[var(--ds-text-muted)] mt-1"
                           >
-                            条件が未設定の場合、このグループはどの編集画面にも表示されません。
+                            <span x-text="t('fields.noConditionNote')"></span>
                           </p>
                         </div>
 
@@ -2756,7 +2756,7 @@
                         <div>
                           <h3 class="text-sm font-bold mb-1" x-text="t('fields.inputItems')"></h3>
                           <p class="text-xs text-[var(--ds-text-muted)] mb-2">
-                            記事の編集画面に表示される入力欄です。「ラベル」と「種類」を決めるだけで追加できます。
+                            <span x-text="t('fields.inputNote')"></span>
                           </p>
                           <div class="space-y-2">
                             <template x-for="(f, idx) in currentFieldGroup.fields" :key="idx">
@@ -2766,7 +2766,7 @@
                                 <div class="flex gap-2 items-end">
                                   <div class="flex-1">
                                     <label class="text-xs text-[var(--ds-text-muted)]">
-                                      ラベル（画面に表示される名前）
+                                      <span x-text="t('fields.labelDisplay')"></span>
                                     </label>
                                     <input
                                       type="text"
@@ -2797,7 +2797,7 @@
                                     @click="removeFieldFromGroup(idx)"
                                     class="text-[var(--ds-danger-600)] text-xs pb-1"
                                   >
-                                    削除
+                                    <span x-text="t('btn.delete')"></span>
                                   </button>
                                 </div>
                                 <div>
@@ -2816,7 +2816,7 @@
                                       x-model="f.required"
                                       class="accent-[var(--ds-primary-600)]"
                                     />
-                                    必須
+                                    <span x-text="t('fields.required')"></span>
                                   </label>
                                   <button
                                     @click="f._expanded = !f._expanded"
@@ -2837,7 +2837,7 @@
                                       <label
                                         class="text-xs text-[var(--ds-text-muted)] font-medium"
                                       >
-                                        キー（英数字・URL や出力に使用。通常は自動生成のままで OK）
+                                        <span x-text="t('fields.keyNote')"></span>
                                       </label>
                                       <input
                                         type="text"
@@ -2853,7 +2853,7 @@
                                         <label
                                           class="text-xs text-[var(--ds-text-muted)] font-medium"
                                         >
-                                          選択肢
+                                          <span x-text="t('fields.options')"></span>
                                         </label>
                                         <div class="space-y-1 mt-1">
                                           <template
@@ -2883,7 +2883,7 @@
                                           type="button"
                                           class="text-xs text-[var(--ds-primary-600)] hover:underline mt-1"
                                         >
-                                          + 選択肢追加
+                                          <span x-text="t('fields.addOption')"></span>
                                         </button>
                                       </div>
                                     </template>
@@ -2892,7 +2892,7 @@
                                         <label
                                           class="text-xs text-[var(--ds-text-muted)] font-medium"
                                         >
-                                          サブフィールド
+                                          <span x-text="t('fields.subfields')"></span>
                                         </label>
                                         <div class="space-y-1 mt-1">
                                           <template
@@ -2946,7 +2946,7 @@
                                           type="button"
                                           class="text-xs text-[var(--ds-primary-600)] hover:underline mt-1"
                                         >
-                                          + サブフィールド追加
+                                          <span x-text="t('fields.addSubfield')"></span>
                                         </button>
                                       </div>
                                     </template>
@@ -2954,7 +2954,7 @@
                                       <label
                                         class="text-xs text-[var(--ds-text-muted)] font-medium"
                                       >
-                                        条件表示 (showIf)
+                                        <span x-text="t('fields.showIf')"></span>
                                       </label>
                                       <div class="flex gap-2 mt-1">
                                         <input
@@ -2971,7 +2971,7 @@
                                         />
                                       </div>
                                       <p class="text-[10px] text-[var(--ds-text-muted)] mt-0.5">
-                                        指定フィールドが指定値のときのみ表示
+                                        <span x-text="t('fields.showIfNote')"></span>
                                       </p>
                                     </div>
                                   </div>
@@ -2981,7 +2981,7 @@
                           </div>
                           <button @click="addFieldToGroup()" class="gh-btn-outline text-xs mt-2">
                             <i data-lucide="plus" class="w-3 h-3"></i>
-                            入力項目を追加
+                            <span x-text="t('fields.addInput')"></span>
                           </button>
                         </div>
 
@@ -2990,11 +2990,11 @@
                           <div class="border-t border-[var(--ds-border-default)] pt-4">
                             <h3 class="text-sm font-bold mb-2" x-text="t('tpl.code')"></h3>
                             <p class="text-xs text-[var(--ds-text-muted)] mb-3">
-                              テンプレートファイルに貼り付けてフィールドを表示できます。
+                              <span x-text="t('fields.fieldTplNote')"></span>
                             </p>
                             <div
                               class="bg-[var(--ds-bg-muted)] border border-[var(--ds-border-default)] rounded-md p-3 cursor-pointer relative group overflow-x-auto"
-                              @click="navigator.clipboard.writeText($el.querySelector('pre').textContent); showToast('コピーしました')"
+                              @click="navigator.clipboard.writeText($el.querySelector('pre').textContent); showToast(t('toast.copied'))"
                             >
                               <pre
                                 class="font-mono text-xs text-[var(--ds-text-heading)] select-all m-0 whitespace-pre"
@@ -3003,7 +3003,7 @@
                               <span
                                 class="absolute top-2 right-2 text-[var(--ds-text-muted)] opacity-0 group-hover:opacity-100 transition-opacity text-xs"
                               >
-                                クリックでコピー
+                                <span x-text="t('common.clickToCopy')"></span>
                               </span>
                             </div>
                           </div>
@@ -3014,7 +3014,7 @@
                   <template x-if="!currentFieldGroup">
                     <div class="flex-1 flex items-center justify-center h-full">
                       <p class="text-sm text-[var(--ds-text-muted)]">
-                        フィールドグループを選択または新規作成
+                        <span x-text="t('fields.selectOrNew')"></span>
                       </p>
                     </div>
                   </template>
@@ -3033,10 +3033,10 @@
                   <!-- テーマを選ぶ -->
                   <div>
                     <h2 class="text-base font-bold text-[var(--ds-text-heading)] mb-1">
-                      テーマを選ぶ
+                      <span x-text="t('theme.choose')"></span>
                     </h2>
                     <p class="text-[12px] text-[var(--ds-text-muted)] mb-3">
-                      サイトの見た目（テンプレート一式）を選びます。「有効化」で即座に切り替わります。
+                      <span x-text="t('theme.chooseNote')"></span>
                     </p>
                     <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
                       <template x-for="t in installedThemes" :key="t.id">
@@ -3060,12 +3060,12 @@
                               class="inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--ds-primary-600)]"
                             >
                               <i data-lucide="circle-check" class="w-3.5 h-3.5"></i>
-                              使用中
+                              <span x-text="t('theme.inUse')"></span>
                             </span>
                           </template>
                           <template x-if="activeThemeId !== t.id">
                             <button @click="switchTheme(t.id)" class="gh-btn-outline text-[12px]">
-                              有効化
+                              <span x-text="t('theme.activate')"></span>
                             </button>
                           </template>
                         </div>
@@ -3101,7 +3101,7 @@
                         x-text="t('nav.themeDev')"
                       ></h2>
                       <p class="text-[11px] text-[var(--ds-text-muted)] mt-1 leading-snug">
-                        編集中:
+                        <span x-text="t('tpl.editingLabel')"></span>
                         <span
                           class="font-medium"
                           x-text="activeThemeManifest?.name || activeThemeId"
@@ -3132,7 +3132,7 @@
                     <h3
                       class="text-xs font-bold text-[var(--ds-text-muted)] uppercase tracking-wider mb-2"
                     >
-                      テンプレート
+                      <span x-text="t('tpl.templates')"></span>
                     </h3>
                     <div class="space-y-0.5">
                       <template
@@ -3162,7 +3162,7 @@
                         <h3
                           class="text-xs font-bold text-[var(--ds-text-muted)] uppercase tracking-wider mb-2"
                         >
-                          コンポーネント
+                          <span x-text="t('tpl.components')"></span>
                         </h3>
                         <p class="text-[10px] text-[var(--ds-text-muted)] mb-2 leading-snug">
                           {{> name}} で他のテンプレートから呼び出せる再利用パーシャル
@@ -3210,7 +3210,7 @@
                               class="gh-btn-outline text-xs"
                             >
                               <i data-lucide="code" class="w-3 h-3"></i>
-                              サンプル挿入
+                              <span x-text="t('tpl.insertSample')"></span>
                             </button>
                             <div
                               x-show="showSampleMenu"
@@ -3237,7 +3237,7 @@
                           </div>
                         </template>
                         <button @click="saveTemplateFile()" class="gh-btn-green text-[13px]">
-                          保存
+                          <span x-text="t('btn.save')"></span>
                         </button>
                       </div>
                       <textarea
@@ -3253,7 +3253,7 @@
                   <template x-if="!currentTemplateFile">
                     <div class="flex-1 flex items-center justify-center">
                       <p class="text-sm text-[var(--ds-text-muted)]">
-                        左のファイル一覧からテンプレートを選択
+                        <span x-text="t('tpl.selectFromList')"></span>
                       </p>
                     </div>
                   </template>
@@ -3290,10 +3290,10 @@
                       class="text-xs font-bold text-[var(--ds-text-muted)] uppercase tracking-wider mb-3 flex items-center gap-1.5"
                     >
                       <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
-                      リファレンス
+                      <span x-text="t('tpl.reference')"></span>
                     </h3>
                     <p class="text-[10px] text-[var(--ds-text-muted)] mb-3 leading-snug">
-                      クリックでクリップボードにコピー、または編集中ファイルのカーソル位置に挿入できます。
+                      <span x-text="t('tpl.referenceNote')"></span>
                     </p>
 
                     <!-- 各セクション（カテゴリ別） -->
@@ -3328,10 +3328,10 @@
                                     const pos = ta.selectionStart;
                                     templateCode = templateCode.substring(0, pos) + item.code + templateCode.substring(pos);
                                     $nextTick(() => { ta.focus(); ta.selectionStart = ta.selectionEnd = pos + item.code.length });
-                                    showToast('カーソル位置に挿入しました');
+                                    showToast(t('toast.inserted'));
                                   } else {
                                     navigator.clipboard.writeText(item.code);
-                                    showToast('コピーしました');
+                                    showToast(t('toast.copied'));
                                   }
                                 "
                               >
@@ -3397,10 +3397,10 @@
                                       const pos = ta.selectionStart;
                                       templateCode = templateCode.substring(0, pos) + item.code + templateCode.substring(pos);
                                       $nextTick(() => { ta.focus(); ta.selectionStart = ta.selectionEnd = pos + item.code.length });
-                                      showToast('カーソル位置に挿入しました');
+                                      showToast(t('toast.inserted'));
                                     } else {
                                       navigator.clipboard.writeText(item.code);
-                                      showToast('コピーしました');
+                                      showToast(t('toast.copied'));
                                     }
                                   "
                                 >
@@ -3524,7 +3524,7 @@
                               @click="removeLogo()"
                               class="text-[var(--ds-danger-600)] text-xs hover:underline whitespace-nowrap"
                             >
-                              削除
+                              <span x-text="t('btn.delete')"></span>
                             </button>
                           </template>
                         </div>
@@ -3572,7 +3572,7 @@
                               @click="removeFavicon()"
                               class="text-[var(--ds-danger-600)] text-xs hover:underline whitespace-nowrap"
                             >
-                              削除
+                              <span x-text="t('btn.delete')"></span>
                             </button>
                           </template>
                         </div>
@@ -3599,7 +3599,7 @@
 
                   <div class="h-px bg-[var(--ds-border-default)] my-2"></div>
                   <h2 class="text-base font-bold text-[var(--ds-text-heading)]">
-                    カスタムスクリプト
+                    <span x-text="t('field.customScript')"></span>
                   </h2>
 
                   <div>
@@ -3652,7 +3652,7 @@
                             <span
                               class="text-[10px] px-1.5 py-0.5 rounded bg-[var(--ds-primary-600)] text-white font-semibold tracking-wide"
                             >
-                              デフォルト
+                              <span x-text="t('lang.defaultBadge')"></span>
                             </span>
                           </template>
                         </span>
@@ -3660,10 +3660,10 @@
                     </div>
                     <button @click="loadLangEditor()" class="gh-btn-outline text-xs">
                       <i data-lucide="languages" class="w-3.5 h-3.5"></i>
-                      言語設定を編集
+                      <span x-text="t('lang.editBtn')"></span>
                     </button>
                     <p class="text-[11px] text-[var(--ds-text-muted)] mt-1">
-                      公開サイトで利用する言語の追加・削除、デフォルト言語の設定を行います
+                      <span x-text="t('lang.note')"></span>
                     </p>
                   </div>
                 </div>
@@ -3729,7 +3729,7 @@
                     </template>
                     <template x-if="lastBackupPath">
                       <p class="mt-2 text-[11px] text-[var(--ds-text-muted)]">
-                        最終バックアップ:
+                        <span x-text="t('settings.lastBackup')"></span>
                         <span x-text="lastBackupPath"></span>
                       </p>
                     </template>
@@ -3867,7 +3867,7 @@
                     <span
                       class="gh-badge bg-[var(--ds-primary-600)]/10 text-[var(--ds-primary-600)]"
                     >
-                      最新
+                      <span x-text="t('revision.latest')"></span>
                     </span>
                   </template>
                 </div>
@@ -3876,7 +3876,7 @@
             </template>
             <template x-if="revisions.length === 0">
               <div class="px-4 py-10 text-center text-xs text-[var(--ds-text-placeholder)]">
-                履歴がありません
+                <span x-text="t('revision.none')"></span>
               </div>
             </template>
             <template x-if="revisionDiff">
@@ -3890,7 +3890,7 @@
                   x-html="revisionDiff"
                 ></div>
                 <button @click="restoreRevision()" class="mt-3 w-full ds-btn-danger text-xs">
-                  この版に戻す
+                  <span x-text="t('revision.restore')"></span>
                 </button>
               </div>
             </template>
@@ -4025,11 +4025,11 @@
                   x-model="editingType.hasDate"
                   class="accent-[var(--ds-primary-600)]"
                 />
-                投稿日
+                <span x-text="t('field.publishDate')"></span>
               </label>
             </div>
             <p class="text-[11px] text-[var(--ds-text-muted)] -mt-1">
-              タイトル・本文・サムネイル・カテゴリ・タグは全タイプ共通で常に表示されます。
+              <span x-text="t('type.commonNote')"></span>
             </p>
             <div class="h-px bg-[var(--ds-border-default)] my-2"></div>
             <div>
@@ -4041,7 +4041,7 @@
               </p>
               <button type="button" @click="goEditFieldGroup()" class="gh-btn-outline text-xs">
                 <i data-lucide="settings" class="w-3 h-3"></i>
-                フィールドグループを管理
+                <span x-text="t('type.manageFieldGroups')"></span>
               </button>
             </div>
           </div>
@@ -4052,14 +4052,14 @@
               @click="deleteType()"
               class="text-[var(--ds-danger-600)] text-xs hover:underline"
             >
-              削除
+              <span x-text="t('btn.delete')"></span>
             </button>
             <div class="flex gap-2 ml-auto">
               <button
                 @click="showTypeEditor=false; editingType=null"
                 class="gh-btn-outline text-xs"
               >
-                キャンセル
+                <span x-text="t('btn.cancel')"></span>
               </button>
               <button
                 @click="saveType()"
@@ -4104,7 +4104,7 @@
           <template x-if="templateUpdates.some((u) => u.status === 'safe')">
             <button @click="applySafeTemplateUpdates()" class="gh-btn-green text-xs mb-3">
               <i data-lucide="check" class="w-3.5 h-3.5"></i>
-              未編集をまとめて更新
+              <span x-text="t('tpl.updateUnedited')"></span>
             </button>
           </template>
           <div class="space-y-2">
@@ -4132,7 +4132,7 @@
                     @click="applyTemplateUpdate(u.path)"
                     class="gh-btn-green text-xs shrink-0"
                   >
-                    更新
+                    <span x-text="t('btn.update')"></span>
                   </button>
                 </div>
                 <template x-if="selectedUpdatePath === u.path && templateUpdateDiff !== null">
@@ -4165,7 +4165,7 @@
             </button>
           </div>
           <p class="text-xs text-[var(--ds-text-muted)] mb-4">
-            入力欄のタイプを選びます。あとから変更できます。
+            <span x-text="t('fieldPicker.note')"></span>
           </p>
           <template x-for="cat in fieldTypeCategories" :key="cat.id">
             <div class="mb-4">
@@ -4245,7 +4245,7 @@
                 placeholder="🇯🇵"
               />
               <button @click="removeLangLocale(idx)" class="text-[var(--ds-danger-600)] text-xs">
-                削除
+                <span x-text="t('btn.delete')"></span>
               </button>
             </div>
           </template>

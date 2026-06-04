@@ -34,22 +34,42 @@ export const i18nMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     this.uiCatalog = cat || DEFAULT_UI_CATALOGS[this.uiLocale] || DEFAULT_UI_CATALOGS.ja || {}
   },
 
-  /** 翻訳カタログ＋テンプレートをプロジェクトに用意（無ければ作成）。
+  /** 翻訳カタログ＋テンプレートをプロジェクトに用意。
+   *  - 無ければ作成。
+   *  - 既存ファイルには、新版で追加された未収録キーだけを補完（既存の訳は優先）。
    *  運用者は content/i18n/ 内のファイルを直接編集して翻訳を調整できる。 */
   async ensureI18nFiles() {
     if (!this.fs) return
     for (const [loc, cat] of Object.entries(DEFAULT_UI_CATALOGS)) {
       const path = `${PATH_I18N_DIR}/${loc}.json`
-      if ((await this.fs.readJson(path)) === null) {
+      const existing = await this.fs.readJson<Record<string, string>>(path)
+      if (!existing) {
         await this.fs.writeJson(path, cat)
+        continue
+      }
+      // 既定にあって未収録のキーのみ追加（既存の翻訳は上書きしない）
+      let changed = false
+      const merged = { ...existing }
+      for (const [key, val] of Object.entries(cat)) {
+        if (!(key in merged)) {
+          merged[key] = val
+          changed = true
+        }
+      }
+      if (changed) await this.fs.writeJson(path, merged)
+    }
+    // 新言語追加用テンプレート（全 msgid・空訳）。既存にも不足キーを補完。
+    const tplPath = `${PATH_I18N_DIR}/_template.json`
+    const tplExisting = (await this.fs.readJson<Record<string, string>>(tplPath)) || {}
+    let tplChanged = false
+    for (const key of Object.keys(DEFAULT_UI_CATALOGS.en || {})) {
+      if (!(key in tplExisting)) {
+        tplExisting[key] = ''
+        tplChanged = true
       }
     }
-    // 新言語追加用テンプレート（全 msgid・空訳）。英語カタログのキーを基準に生成。
-    const tplPath = `${PATH_I18N_DIR}/_template.json`
-    if ((await this.fs.readJson(tplPath)) === null) {
-      const tpl: Record<string, string> = {}
-      for (const key of Object.keys(DEFAULT_UI_CATALOGS.en || {})) tpl[key] = ''
-      await this.fs.writeJson(tplPath, tpl)
+    if (tplChanged || Object.keys(tplExisting).length === 0) {
+      await this.fs.writeJson(tplPath, tplExisting)
     }
   },
 

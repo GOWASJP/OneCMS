@@ -159,7 +159,7 @@ export const structureMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
   },
 
   async addMenu() {
-    const name = await this.showPrompt('メニュー名')
+    const name = await this.showPrompt(this.t('menu.nameLabel'))
     if (!name?.trim()) return
     const slug = name
       .trim()
