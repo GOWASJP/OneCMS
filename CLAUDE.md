@@ -28,4 +28,4 @@
 - `src/` - TypeScriptソース
 - `templates/` - Handlebarsテンプレート（SvelteKit風パーシャル構造）
 - `content/` - コンテンツデータ（JSON）
-- `build/` - ビルド出力（cms.html単一ファイル）
+- `build/` - ビルド出力（onecms.html単一ファイル）
