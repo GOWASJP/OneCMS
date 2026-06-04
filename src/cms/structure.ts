@@ -182,7 +182,8 @@ export const structureMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
 
   async deleteMenu() {
     if (!this.currentMenu) return
-    if (!(await this.showConfirm(`「${this.currentMenu.name}」を削除しますか？`))) return
+    if (!(await this.showConfirm(this.t('confirm.deleteNamed', { name: this.currentMenu.name }))))
+      return
     this.menuData.menus = this.menuData.menus.filter((m) => m.id !== this.currentMenuId)
     this.currentMenu = null
     this.currentMenuId = ''
@@ -209,7 +210,12 @@ export const structureMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
   async removeMenuItem(idx: number) {
     if (!this.currentMenu) return
     const removed = this.currentMenu.items[idx]
-    if (!(await this.showConfirm(`「${removed.label || '項目'}」を削除しますか？`))) return
+    if (
+      !(await this.showConfirm(
+        this.t('confirm.deleteNamed', { name: removed.label || this.t('label.item') }),
+      ))
+    )
+      return
     // 子項目の親をクリア
     for (const item of this.currentMenu.items) {
       if (item.parent === removed.id) item.parent = removed.parent || ''

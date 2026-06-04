@@ -383,7 +383,12 @@ export const contentTypesMixin: Partial<CmsComponent> & ThisType<CmsComponent> =
 
   async deleteFieldGroup() {
     if (!this.currentFieldGroup?.id) return
-    if (!(await this.showConfirm(`「${this.currentFieldGroup.label}」を削除しますか？`))) return
+    if (
+      !(await this.showConfirm(
+        this.t('confirm.deleteNamed', { name: this.currentFieldGroup.label }),
+      ))
+    )
+      return
     const dir = await this.fs!.getDir('content/_fieldGroups')
     if (dir) {
       try {
@@ -511,7 +516,7 @@ export const contentTypesMixin: Partial<CmsComponent> & ThisType<CmsComponent> =
     const typeId = this.currentType?.id || this.editingType?.id
     const typeLabel = this.currentType?.label || this.editingType?.label || typeId || '不明'
     if (!this.fs) return
-    if (!(await this.showConfirm(`「${typeLabel}」を削除しますか？`))) return
+    if (!(await this.showConfirm(this.t('confirm.deleteNamed', { name: typeLabel })))) return
 
     const dir = await this.fs.getDir('content/_types')
     if (dir && typeId) {

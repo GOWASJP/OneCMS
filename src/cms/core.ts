@@ -628,7 +628,7 @@ export const coreMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
   /** ファビコン削除 */
   async removeFavicon() {
     if (!this.fs) return
-    if (!(await this.showConfirm('ファビコンを削除しますか？'))) return
+    if (!(await this.showConfirm(this.t('confirm.removeFavicon')))) return
     await removeOldAssetFiles(this.fs, 'favicon', FAVICON_EXTS)
     delete (this.siteConfig as any).favicon
     await this.fs.writeJson(PATH_SITE_CONFIG, this.siteConfig)
@@ -679,7 +679,7 @@ export const coreMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
   /** ロゴ削除 */
   async removeLogo() {
     if (!this.fs) return
-    if (!(await this.showConfirm('ロゴを削除しますか？'))) return
+    if (!(await this.showConfirm(this.t('confirm.removeLogo')))) return
     await removeOldAssetFiles(this.fs, 'logo', LOGO_EXTS)
     delete (this.siteConfig as any).logo
     await this.fs.writeJson(PATH_SITE_CONFIG, this.siteConfig)

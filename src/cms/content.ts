@@ -439,7 +439,7 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
   async deleteContent() {
     if (!this.fs || !this.currentType || !this.currentPage) return
     const title = this.currentPage.title || this.currentPage.id
-    if (!(await this.showConfirm(`「${title}」を削除しますか？`))) return
+    if (!(await this.showConfirm(this.t('confirm.deleteNamed', { name: title })))) return
     const dir = await this.fs.getDir(`content/${this.currentType.id}/${this.currentPage.id}`)
     if (dir) {
       // ディレクトリ内の全ファイルを削除
@@ -463,7 +463,7 @@ export const contentMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
   async deletePage() {
     if (!this.fs || !this.currentPage) return
     const title = this.currentPage.title || this.currentPage.id
-    if (!(await this.showConfirm(`「${title}」を削除しますか？`))) return
+    if (!(await this.showConfirm(this.t('confirm.deleteNamed', { name: title })))) return
     const parentDir = await this.fs.getDir('content/pages')
     if (parentDir) {
       try {

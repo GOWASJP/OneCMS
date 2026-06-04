@@ -264,7 +264,7 @@ export const outputMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     this.siteConfig.themeId = id
     await this.loadActiveThemeManifest()
     await this.saveSiteConfig()
-    this.showToast(`テーマを「${this.activeThemeManifest?.name || id}」に切り替えました`)
+    this.showToast(this.t('toast.themeSwitched', { name: this.activeThemeManifest?.name || id }))
   },
 
   /** テーマ設定ページ（外観）を開く。インストール済みテーマと manifest を読み込む。 */
@@ -356,15 +356,14 @@ export const outputMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     const bundled = INITIAL_TEMPLATES[path]
     if (bundled === undefined) return
     const name = path.split('/').pop() || path
-    if (!(await this.showConfirm(`「${name}」を新しい既定の内容で上書きします。よろしいですか？`)))
-      return
+    if (!(await this.showConfirm(this.t('confirm.overwriteDefault', { name })))) return
     await this.fs.writeText(path, bundled)
     const baseline = (await this.fs.readJson<Record<string, string>>(PATH_TEMPLATES_BASELINE)) || {}
     baseline[path] = await this.diffEngine.hash(bundled)
     await this.fs.writeJson(PATH_TEMPLATES_BASELINE, baseline)
     if (this.currentTemplateFile === path) this.templateCode = bundled
     await this.checkTemplateUpdates()
-    this.showToast(`「${name}」を更新しました`)
+    this.showToast(this.t('toast.updatedNamed', { name }))
   },
 
   /** 未編集（safe）のテンプレートをまとめて更新する */
@@ -372,12 +371,7 @@ export const outputMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     if (!this.fs || !this.diffEngine) return
     const safe = this.templateUpdates.filter((u) => u.status === 'safe')
     if (!safe.length) return
-    if (
-      !(await this.showConfirm(
-        `未編集の ${safe.length} 件を新しい既定に更新します。よろしいですか？`,
-      ))
-    )
-      return
+    if (!(await this.showConfirm(this.t('confirm.updateSafe', { n: safe.length })))) return
     const baseline = (await this.fs.readJson<Record<string, string>>(PATH_TEMPLATES_BASELINE)) || {}
     for (const u of safe) {
       const bundled = INITIAL_TEMPLATES[u.path]
@@ -388,7 +382,7 @@ export const outputMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     }
     await this.fs.writeJson(PATH_TEMPLATES_BASELINE, baseline)
     await this.checkTemplateUpdates()
-    this.showToast(`${safe.length} 件のテンプレートを更新しました`)
+    this.showToast(this.t('toast.templatesUpdated', { n: safe.length }))
   },
 
   async openTemplateFile(path: string) {
