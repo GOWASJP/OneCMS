@@ -4,6 +4,12 @@ dist/
 changed/
 .revisions/
 .cms/
-content/**/_index.json
+
+# プロジェクト（サイト）データ。リポジトリのソースではないため追跡しない
+content/
+
+# 個人のローカル設定（共有しない）
+.claude/settings.local.json
+
 .DS_Store
 *.log
