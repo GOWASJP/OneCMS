@@ -15,7 +15,7 @@
 
 ## デモ
 
-1. [Releases](https://github.com/GOWASJP/OneCMS/releases) から `onecms.html` をダウンロード
+1. [Releases](https://github.com/GOWASJP/oneCMS/releases) から `onecms.html` をダウンロード
 2. Chrome または Edge で開く
 3. 担当者名を入力して「開始する」
 4. 空のフォルダを選択（初期データが自動生成されます）
@@ -146,8 +146,8 @@ my-site/
 ### セットアップ
 
 ```bash
-git clone https://github.com/GOWASJP/OneCMS.git
-cd OneCMS
+git clone https://github.com/GOWASJP/oneCMS.git
+cd oneCMS
 npm install
 ```
 
@@ -199,9 +199,9 @@ npm run build
 [Apache License 2.0](./LICENSE) © GOWAS LLC
 
 無料版 ONE CMS は Apache-2.0 で提供されます（改変・再配布可）。
-「ONE CMS」「OneCMS Pro」の名称・ロゴは GOWAS LLC の商標です。Apache-2.0
+「ONE CMS」「oneCMS Pro」の名称・ロゴは GOWAS LLC の商標です。Apache-2.0
 ライセンスはこれら商標の使用権を付与しません（出所表示としての通常利用を除く）。
-有料版 **OneCMS Pro** は別ライセンス（商用）で提供されます。
+有料版 **oneCMS Pro** は別ライセンス（商用）で提供されます。
 
 ## 作成者
 
