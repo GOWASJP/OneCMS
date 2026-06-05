@@ -1,29 +1,84 @@
-{{!-- フロントページ用テンプレート（サンプル） --}}
-{{!-- 設定で「フロントページ」に選んだ固定ページが / にマップされ、このテンプレートで描画されます。 --}}
-{{!-- フロントページも通常ページなので、本文（page.body）がそのまま入ります。 --}}
-{{!-- 製作者はこのファイルを自由に書き換えてデザインを構築できます。home.hbs が無ければ page.hbs が使われます。 --}}
+{{!-- ===== コーポレートサイトのトップページ ===== --}}
+{{!-- 凝ったレイアウトは「テーマ」に記述します（制作会社が自由にカスタマイズ）。 --}}
+{{!-- 見出しやキャッチコピー等の文言はこのテンプレートを直接編集して変更してください。 --}}
+{{!-- 各セクションは _base.hbs の <div class="container"> 内に描画されます。 --}}
 
-<article class="home">
-  <div class="container">
-    {{!-- フロントページではページタイトル（例: ホーム）は表示しない。ヒーロー等が見出しを担う --}}
-    {{{page.body}}}
-  </div>
-</article>
+<section class="home-hero">
+  <p class="home-hero-eyebrow">CORPORATE SITE</p>
+  <h1>未来を、確かなかたちに。</h1>
+  <p class="home-hero-lead">私たちはテクノロジーとデザインの力で、お客様のビジネスの成長を支援します。</p>
+  <p class="home-hero-actions">
+    <a href="/contact/" class="btn">お問い合わせ</a>
+    <a href="/services/" class="btn btn-ghost">事業内容を見る</a>
+  </p>
+</section>
 
-{{!-- サンプル: 最新のお知らせ一覧（不要なら削除してください） --}}
-<section class="home-news">
-  <div class="container">
-    <h2>お知らせ</h2>
-    <ul class="news-list">
-      {{#each (latestItems 'news' 5 lang)}}
-        <li>
-          <a href="{{url}}">
-            <time datetime="{{publishedAt}}">{{formatDate publishedAt}}</time>
-            <span>{{title}}</span>
-          </a>
-        </li>
-      {{/each}}
-    </ul>
-    <p class="news-more"><a href="/{{#unless (eq lang defaultLang)}}{{lang}}/{{/unless}}news/">すべて見る</a></p>
+{{!-- 管理画面で編集できる自由記述エリア（ページ本文）。不要なら空のままで構いません。 --}}
+{{#if page.body}}
+<section class="home-intro">{{{page.body}}}</section>
+{{/if}}
+
+<section class="home-section">
+  <h2 class="section-title">私たちの強み</h2>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <span class="feature-num">01</span>
+      <h3>確かな技術力</h3>
+      <p>長年培った知見と最新技術で、最適なソリューションをご提供します。</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-num">02</span>
+      <h3>伴走するサポート</h3>
+      <p>導入から運用まで、専任チームが一貫してサポートします。</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-num">03</span>
+      <h3>柔軟な対応力</h3>
+      <p>お客様の課題に合わせて、最適なプランをご提案します。</p>
+    </div>
   </div>
+</section>
+
+<section class="home-section">
+  <h2 class="section-title">事業内容</h2>
+  <div class="service-grid">
+    <article class="service-card">
+      <div class="ph" data-label="IMAGE"></div>
+      <h3>ITコンサルティング</h3>
+      <p>経営課題に寄り添い、DX戦略の立案から実行までを支援します。</p>
+    </article>
+    <article class="service-card">
+      <div class="ph" data-label="IMAGE"></div>
+      <h3>システム開発</h3>
+      <p>要件定義から運用保守まで、ワンストップで対応します。</p>
+    </article>
+    <article class="service-card">
+      <div class="ph" data-label="IMAGE"></div>
+      <h3>クラウド導入支援</h3>
+      <p>セキュアでスケーラブルな基盤構築をご支援します。</p>
+    </article>
+  </div>
+</section>
+
+<section class="home-news-block">
+  <h2 class="section-title">お知らせ</h2>
+  <ul class="news-list">
+    {{#each (latestItems 'news' 5 lang)}}
+      <li>
+        <a href="{{url}}">
+          <time datetime="{{publishedAt}}">{{formatDate publishedAt}}</time>
+          <span>{{title}}</span>
+        </a>
+      </li>
+    {{/each}}
+  </ul>
+  <p class="news-more">
+    <a href="/{{#unless (eq lang defaultLang)}}{{lang}}/{{/unless}}news/">すべて見る</a>
+  </p>
+</section>
+
+<section class="home-cta">
+  <h2>お気軽にご相談ください</h2>
+  <p>サービスに関するご質問・お見積もりはお問い合わせフォームから承ります。</p>
+  <a href="/contact/" class="btn btn-light">お問い合わせ</a>
 </section>
