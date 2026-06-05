@@ -14,7 +14,7 @@ export const EDITION: Edition = import.meta.env.VITE_EDITION === 'pro' ? 'pro' :
 // 書き出し HTML に透かしとして注入し、流出元の特定に使う。
 export const LICENSE_ID: string = (import.meta.env.VITE_LICENSE_ID as string | undefined) || ''
 
-// カナリア文字列。世界に1つの固有トークンで、コピーされた cms.html や
+// カナリア文字列。世界に1つの固有トークンで、コピーされた onecms.html や
 // 生成サイトを GitHub / PublicWWW 等で検索・発見するための目印。
 export const CANARY = 'ONECMS-Cf9K3xQ2-mark'
 

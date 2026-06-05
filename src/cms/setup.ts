@@ -187,7 +187,7 @@ export const setupMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
         this.dataSchemaVersion = from
         this.schemaWarning =
           `このデータは新しいバージョン（データ形式 v${from}）で作成されています。` +
-          `現在の本体は v${SCHEMA_VERSION} までの対応です。最新の cms.html をご利用ください。`
+          `現在の本体は v${SCHEMA_VERSION} までの対応です。最新の onecms.html をご利用ください。`
         this.showToast(this.t('toast.dataNewerWarning'), 6000)
         return
       }
