@@ -139,7 +139,9 @@ export const contentTypesMixin: Partial<CmsComponent> & ThisType<CmsComponent> =
 
   openTypeEditor(type?: ContentType) {
     const raw = type
-      ? structuredClone(type)
+      ? // Alpine のリアクティブプロキシは structuredClone 不可（DataCloneError）。
+        // JSON 往復でプレーンなスナップショットに変換する。
+        (JSON.parse(JSON.stringify(type)) as ContentType)
       : {
           id: '',
           label: '',
@@ -227,7 +229,8 @@ export const contentTypesMixin: Partial<CmsComponent> & ThisType<CmsComponent> =
   },
 
   openFieldGroup(group: FieldGroup) {
-    this.currentFieldGroup = structuredClone(group)
+    // Alpine のリアクティブプロキシは structuredClone 不可のため JSON 往復でクローン
+    this.currentFieldGroup = JSON.parse(JSON.stringify(group)) as FieldGroup
     if (!this.currentFieldGroup!.locations) this.currentFieldGroup!.locations = []
     // UI用プロパティ付与
     this.currentFieldGroup!.fields = this.currentFieldGroup!.fields.map((f) => ({

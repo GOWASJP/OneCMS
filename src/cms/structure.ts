@@ -292,7 +292,8 @@ export const structureMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
   // --- 言語設定 ---
 
   loadLangEditor() {
-    this.langEditorData = structuredClone(this.languages)
+    // Alpine のリアクティブプロキシは structuredClone 不可のため JSON 往復でクローン
+    this.langEditorData = JSON.parse(JSON.stringify(this.languages))
     this.showLangEditor = true
   },
 
