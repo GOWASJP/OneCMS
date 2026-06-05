@@ -1,0 +1,15 @@
+{{!-- グローバルナビ（メニュー管理の項目を出力。サブメニュー対応） --}}
+<nav>
+  <ul class="site-nav">
+    {{#each (menuTree site.nav)}}
+    <li>
+      <a href="{{url}}">{{label}}</a>
+      {{#if children.length}}
+      <ul class="sub-menu">
+        {{#each children}}<li><a href="{{url}}">{{label}}</a></li>{{/each}}
+      </ul>
+      {{/if}}
+    </li>
+    {{/each}}
+  </ul>
+</nav>

@@ -1,0 +1,13 @@
+{{> breadcrumb}}
+<h1>{{type.label}}</h1>
+<ul class="post-list">
+  {{#each items}}
+  <li>
+    {{!-- 画像が無ければサイト情報の既定OGPをサムネイルにフォールバック --}}
+    {{#if (thumbnail this @root.site)}}<img src="{{thumbnail this @root.site}}" alt="{{this.title}}">{{/if}}
+    <a href="{{this.url}}">{{this.title}}</a>
+    {{#if this.publishedAt}}<time>{{formatDate this.publishedAt}}</time>{{/if}}
+  </li>
+  {{/each}}
+</ul>
+{{> pagination}}

@@ -1,0 +1,8 @@
+<header class="site-header">
+  {{#if site.logo}}
+  <a href="/"><img src="{{site.logo}}" alt="{{site.name}}" class="site-logo"></a>
+  {{else}}
+  <a href="/">{{site.name}}</a>
+  {{/if}}
+  {{> nav}}
+</header>

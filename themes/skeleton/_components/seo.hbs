@@ -1,0 +1,8 @@
+{{!-- 最小限のSEO/OGP。必要に応じて追記してください。 --}}
+{{autoDescription page}}
+{{faviconTag site}}
+<meta property="og:title" content="{{page.title}}">
+<meta property="og:type" content="website">
+{{#if site.name}}<meta property="og:site_name" content="{{site.name}}">{{/if}}
+{{ogImageTags page site}}
+{{#if site.url}}<link rel="canonical" href="{{site.url}}/{{pagePath}}">{{/if}}

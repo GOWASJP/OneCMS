@@ -1,0 +1,18 @@
+{{!-- スケルトンテーマ: 全ページ共通の土台。ここから自由にデザインを構築してください。 --}}
+<!DOCTYPE html>
+<html lang="{{lang}}">
+<head>
+  {{> head}}
+  {{{site.customHeadScript}}}
+</head>
+<body>
+  {{> header}}
+  <main class="site-main">
+    {{{content}}}
+  </main>
+  {{> footer}}
+  <script src="/assets/js/alpine.min.js" defer></script>
+  {{{site.customBodyScript}}}
+  {{{page.customScript}}}
+</body>
+</html>

@@ -1,0 +1,5 @@
+{{#if breadcrumb}}
+<nav class="breadcrumb" aria-label="パンくず">
+  {{#each breadcrumb}}{{#if this.url}}<a href="{{this.url}}">{{this.label}}</a>{{else}}<span>{{this.label}}</span>{{/if}}{{/each}}
+</nav>
+{{/if}}

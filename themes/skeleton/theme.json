@@ -1,0 +1,9 @@
+{
+  "id": "skeleton",
+  "name": "Skeleton",
+  "version": "1.0",
+  "author": "GOWAS LLC",
+  "description": "最小構成のスケルトンテーマ。デザインを一から構築するための出発点です。",
+  "engine": "handlebars",
+  "apiVersion": "1"
+}
