@@ -4,7 +4,8 @@
 <div class="card-list">
   {{#each items}}
   <article class="card">
-    {{#if this.image}}<img src="{{this.image}}" alt="{{this.title}}">{{/if}}
+    {{!-- 画像が無ければサイト情報の既定OGP画像をサムネイルにフォールバック --}}
+    {{#if (thumbnail this @root.site)}}<img src="{{thumbnail this @root.site}}" alt="{{this.title}}">{{/if}}
     <div class="card-body">
       <h3><a href="{{this.url}}">{{this.title}}</a></h3>
       {{#if this.publishedAt}}<time>{{formatDate this.publishedAt "YYYY年MM月DD日"}}</time>{{/if}}

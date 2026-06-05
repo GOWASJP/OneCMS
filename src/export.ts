@@ -206,6 +206,15 @@ export class Exporter {
       },
     )
 
+    // サムネイルURL：ページ/アイテムに画像があればそれを、無ければサイト既定のOGP画像を返す。
+    // テーマのカード・詳細などで {{thumbnail this site}} のように使う（サイト相対パス）。
+    hbs.registerHelper(
+      'thumbnail',
+      function (item: Record<string, unknown>, site: Record<string, unknown>) {
+        return (item?.image as string) || (site?.ogImage as string) || ''
+      },
+    )
+
     // hreflangタグ生成
     hbs.registerHelper(
       'hreflangTags',

@@ -297,6 +297,11 @@ detail.hbs  →  投稿タイプの詳細`,
 {{/if}}`,
       },
       { label: 'ファビコン パス', code: '{{site.favicon}}' },
+      {
+        label: 'OGP画像 パス',
+        code: '{{site.ogImage}}',
+        note: 'サイト情報で設定した既定OGP画像。サムネイル / og:image のフォールバックに使う',
+      },
       { label: '現在の言語コード', code: '{{lang}}' },
       { label: 'デフォルト言語コード', code: '{{defaultLang}}' },
       { label: '現在のページパス', code: '{{pagePath}}' },
@@ -389,6 +394,18 @@ detail.hbs  →  投稿タイプの詳細`,
         label: 'autoDescription（自動 description）',
         code: '{{autoDescription page}}',
         note: 'meta description / og:description を自動生成',
+      },
+      {
+        label: 'ogImageTags（OGP / Twitter 画像）',
+        code: '{{ogImageTags page site}}',
+        note: 'ページ画像→無ければサイトOGPを og:image / twitter:image に。head 内推奨',
+      },
+      {
+        label: 'thumbnail（サムネイル、OGPフォールバック）',
+        code: `{{#if (thumbnail this site)}}
+  <img src="{{thumbnail this site}}" alt="{{this.title}}">
+{{/if}}`,
+        note: '画像が無ければサイト情報の既定OGP画像URLを返す。カード/一覧のサムネイルに',
       },
       {
         label: 'latestItems（コンテンツタイプ最新N件）',
@@ -883,6 +900,9 @@ const REFERENCE_EN: Record<string, string> = {
   説明: 'Description',
   'サイトロゴ（フォールバック付き）': 'Site logo (with fallback)',
   'ファビコン パス': 'Favicon path',
+  'OGP画像 パス': 'OGP image path',
+  'サイト情報で設定した既定OGP画像。サムネイル / og:image のフォールバックに使う':
+    'The default OGP image set in Site Info. Used as a fallback for thumbnails / og:image.',
   現在の言語コード: 'Current language code',
   デフォルト言語コード: 'Default language code',
   現在のページパス: 'Current page path',
@@ -920,6 +940,12 @@ const REFERENCE_EN: Record<string, string> = {
   'autoDescription（自動 description）': 'autoDescription (auto description)',
   'meta description / og:description を自動生成':
     'Auto-generates meta description / og:description',
+  'ogImageTags（OGP / Twitter 画像）': 'ogImageTags (OGP / Twitter image)',
+  'ページ画像→無ければサイトOGPを og:image / twitter:image に。head 内推奨':
+    'Page image, falling back to the site OGP, as og:image / twitter:image. Recommended inside head.',
+  'thumbnail（サムネイル、OGPフォールバック）': 'thumbnail (with OGP fallback)',
+  '画像が無ければサイト情報の既定OGP画像URLを返す。カード/一覧のサムネイルに':
+    'Returns the site default OGP image URL when no image is set. For card/list thumbnails.',
   'latestItems（コンテンツタイプ最新N件）': 'latestItems (latest N of a content type)',
   '第1引数: タイプ id, 第2引数: 件数, 第3引数: lang': 'Arg 1: type id, arg 2: count, arg 3: lang',
   // alpine
