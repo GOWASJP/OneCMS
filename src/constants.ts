@@ -1,9 +1,9 @@
 /**
- * ONE CMS 定数定義
+ * oneCMS 定数定義
  */
 
 // --- アプリケーション ---
-export const APP_NAME = 'ONE CMS'
+export const APP_NAME = 'oneCMS'
 export const APP_VERSION = '0.9.0'
 
 // エディション。Pro ビルドは VITE_EDITION=pro でビルドして上書きする。
@@ -19,7 +19,8 @@ export const LICENSE_ID: string = (import.meta.env.VITE_LICENSE_ID as string | u
 export const CANARY = 'ONECMS-Cf9K3xQ2-mark'
 
 // 透かしの版。注入仕様を変えたら +1 する（既存サイトの再スタンプを促すため署名に含める）。
-export const STAMP_VERSION = 1
+// v2: ブランド表記を ONE CMS → oneCMS に変更（generator meta）。
+export const STAMP_VERSION = 2
 
 // データ（content/templates）のスキーマバージョン。
 // 破壊的な構造変更を加えたら +1 し、src/migrations.ts にマイグレーションを追加する。

@@ -53,7 +53,7 @@ export const DEFAULT_UI_CATALOGS: Record<string, Record<string, string>> = {
     'status.saved': '保存済み',
     // システム設定 画面
     'settings.intro':
-      'この画面は ONE CMS 自体の動作設定です。サイトに関する情報（サイト名・カラーテーマなど）はサイドバーの「サイト情報」から編集してください。',
+      'この画面は oneCMS 自体の動作設定です。サイトに関する情報（サイト名・カラーテーマなど）はサイドバーの「サイト情報」から編集してください。',
     'settings.version': 'バージョン情報',
     'settings.appVersion': '本体バージョン',
     'settings.dataFormat': 'データ形式',
@@ -490,7 +490,7 @@ export const DEFAULT_UI_CATALOGS: Record<string, Record<string, string>> = {
     'status.saving': 'Saving…',
     'status.saved': 'Saved',
     'settings.intro':
-      'This screen configures ONE CMS itself. Site-related information (site name, etc.) can be edited from “Site info” in the sidebar.',
+      'This screen configures oneCMS itself. Site-related information (site name, etc.) can be edited from “Site info” in the sidebar.',
     'settings.version': 'Version',
     'settings.appVersion': 'App version',
     'settings.dataFormat': 'Data format',

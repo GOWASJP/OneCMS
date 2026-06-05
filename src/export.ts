@@ -987,7 +987,7 @@ function buildSitemap(siteUrl: string, files: ExportFile[]): ExportFile {
  *  テンプレートではなく書き出し側で注入するため、テンプレート編集では除去できない。 */
 function injectStamp(files: ExportFile[]): void {
   const stamp =
-    `<meta name="generator" content="ONE CMS${EDITION === 'pro' ? ' Pro' : ''}` +
+    `<meta name="generator" content="oneCMS${EDITION === 'pro' ? ' Pro' : ''}` +
     `${LICENSE_ID ? ` #${LICENSE_ID}` : ''}">\n<!-- ${CANARY} -->`
   for (const f of files) {
     if (!f.path.endsWith('.html')) continue

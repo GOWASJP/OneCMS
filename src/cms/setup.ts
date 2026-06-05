@@ -159,7 +159,7 @@ export const setupMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
   },
 
   /** バンドル内のテンプレートで、ユーザーフォルダに存在しないファイルだけ補完。
-   *  既存ファイルは絶対に上書きしない。新しいテンプレートが ONE CMS に追加されたとき、
+   *  既存ファイルは絶対に上書きしない。新しいテンプレートが oneCMS に追加されたとき、
    *  既存プロジェクトにも自動で反映されるための仕組み。 */
   async ensureMissingTemplates() {
     if (!this.fs) return

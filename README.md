@@ -1,4 +1,4 @@
-# ONE CMS
+# oneCMS
 
 ブラウザで `onecms.html` を開くだけで動作する、インストール不要の静的サイトジェネレーター型CMSです。
 
@@ -29,7 +29,7 @@
 - 多言語対応（翻訳ステータス管理）
 - テーマの切り替えと「テーマ開発」ワークスペース
 
-<!-- スクリーンショットを追加する場合: ![ONE CMS 管理画面](docs/screenshot.png) -->
+<!-- スクリーンショットを追加する場合: ![oneCMS 管理画面](docs/screenshot.png) -->
 
 ## 技術スタック
 
@@ -198,8 +198,8 @@ npm run build
 
 [Apache License 2.0](./LICENSE) © GOWAS LLC
 
-無料版 ONE CMS は Apache-2.0 で提供されます（改変・再配布可）。
-「ONE CMS」「oneCMS Pro」の名称・ロゴは GOWAS LLC の商標です。Apache-2.0
+無料版 oneCMS は Apache-2.0 で提供されます（改変・再配布可）。
+「oneCMS」「oneCMS Pro」の名称・ロゴは GOWAS LLC の商標です。Apache-2.0
 ライセンスはこれら商標の使用権を付与しません（出所表示としての通常利用を除く）。
 有料版 **oneCMS Pro** は別ライセンス（商用）で提供されます。
 
