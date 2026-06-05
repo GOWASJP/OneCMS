@@ -3102,6 +3102,26 @@
                       <span x-text="t('note.themePkg3')"></span>
                     </p>
                   </div>
+
+                  <!-- サンプルサイトを作る（ダミーデータ挿入） -->
+                  <div
+                    class="border border-[var(--ds-border-default)] rounded-lg p-4 bg-[var(--ds-bg-surface)]"
+                  >
+                    <h2 class="text-base font-bold text-[var(--ds-text-heading)] mb-1">
+                      <span x-text="t('demo.heading')"></span>
+                    </h2>
+                    <p class="text-[12px] text-[var(--ds-text-muted)] mb-3 leading-snug">
+                      <span x-text="t('demo.note')"></span>
+                    </p>
+                    <button
+                      @click="insertDummyData()"
+                      :disabled="demoInserting"
+                      class="gh-btn-outline text-sm disabled:opacity-60"
+                    >
+                      <i data-lucide="sparkles" class="w-4 h-4"></i>
+                      <span x-text="demoInserting ? t('demo.inserting') : t('demo.button')"></span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </template>

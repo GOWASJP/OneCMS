@@ -112,4 +112,5 @@ export {
   Link2,
   Repeat,
   Boxes,
+  Sparkles,
 } from 'lucide'

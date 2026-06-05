@@ -65,6 +65,9 @@ export interface CmsComponent {
   sitePreviewSrcdoc: string
   sitePreviewPath: string
   sitePreviewLoading: boolean
+  // ダミーデータ挿入
+  demoInserting: boolean
+  insertDummyData(): Promise<void>
 
   // 自動保存・離脱警告
   isDirty: boolean

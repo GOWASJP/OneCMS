@@ -174,6 +174,9 @@ export function createInitialState(): Partial<CmsComponent> & ThisType<CmsCompon
     sitePreviewPath: '',
     sitePreviewLoading: false,
 
+    // ダミーデータ挿入中フラグ
+    demoInserting: false,
+
     // 自動保存・離脱警告
     isDirty: false,
 

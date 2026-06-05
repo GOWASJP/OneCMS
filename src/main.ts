@@ -18,6 +18,7 @@ import { contentTypesMixin } from './cms/content-types.ts'
 import { structureMixin } from './cms/structure.ts'
 import { outputMixin } from './cms/output.ts'
 import { i18nMixin } from './cms/i18n.ts'
+import { demoMixin } from './cms/demo.ts'
 import { extensionMixin } from './cms/extensions.ts'
 import { refreshIcons } from './cms/dom.ts'
 
@@ -39,6 +40,7 @@ Alpine.data('cms', () => {
     ...structureMixin,
     ...outputMixin,
     ...i18nMixin,
+    ...demoMixin,
     // Pro / プラグインの拡張（無料コアでは空。Pro ビルドが alias で差し替える）
     ...extensionMixin,
 

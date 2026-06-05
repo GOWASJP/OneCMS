@@ -31,6 +31,15 @@ export const DEFAULT_UI_CATALOGS: Record<string, Record<string, string>> = {
     'btn.preview': 'プレビュー',
     'btn.previewNewTab': '別タブで開く',
     'btn.sitePreview': 'サイト全体をプレビュー',
+    'demo.button': 'ダミーデータを挿入',
+    'demo.heading': 'サンプルサイトを作る',
+    'demo.note':
+      'オーソドックスなコーポレートサイト一式（ホーム・会社概要・事業内容・お知らせ等）を挿入します。画像はスケルトンで表現されます。既存の同名ページは上書きされます。',
+    'demo.inserting': '挿入中...',
+    'demo.confirm':
+      'サンプルのコーポレートサイト一式（固定ページ・お知らせ・メニュー）を挿入します。ホームや会社概要など同名の既存ページは上書きされます。よろしいですか？',
+    'demo.inserted': 'サンプルサイトを挿入しました。プレビューを表示します。',
+    'demo.failed': 'ダミーデータの挿入に失敗しました',
     'sitePreview.title': 'サイトプレビュー',
     'sitePreview.hint': 'リンクをクリックしてページを移動できます',
     'sitePreview.loading': 'サイトを生成中...',
@@ -460,6 +469,15 @@ export const DEFAULT_UI_CATALOGS: Record<string, Record<string, string>> = {
     'btn.preview': 'Preview',
     'btn.previewNewTab': 'Open in new tab',
     'btn.sitePreview': 'Preview entire site',
+    'demo.button': 'Insert dummy data',
+    'demo.heading': 'Create a sample site',
+    'demo.note':
+      'Inserts a complete orthodox corporate site (Home, About, Services, News, etc.). Images are represented as skeletons. Existing pages with the same names are overwritten.',
+    'demo.inserting': 'Inserting...',
+    'demo.confirm':
+      'This inserts a sample corporate site (pages, news, menu). Existing pages with the same names (Home, About, etc.) will be overwritten. Continue?',
+    'demo.inserted': 'Sample site inserted. Opening the preview.',
+    'demo.failed': 'Failed to insert dummy data',
     'sitePreview.title': 'Site preview',
     'sitePreview.hint': 'Click links to navigate between pages',
     'sitePreview.loading': 'Generating site...',
