@@ -219,5 +219,7 @@ export async function hasDir(dir: FileSystemDirectoryHandle, name: string): Prom
 export function stripHtml(html: string): string {
   const tmp = document.createElement('div')
   tmp.innerHTML = html
+  // style/script の中身は textContent に含まれてしまうので除去
+  tmp.querySelectorAll('style, script').forEach((el) => el.remove())
   return tmp.textContent || ''
 }

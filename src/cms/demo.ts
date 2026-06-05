@@ -7,12 +7,13 @@ import { PATH_MENUS, PATH_TAXONOMIES_CATEGORIES } from '../constants.ts'
 
 /** 各ページ本文の先頭に1度だけ差し込むスケルトン用スタイル。テーマに依存せず見た目が出るよう自己完結。 */
 const SK = `<style>
-.sk-img{background:#eef2f7;border:1px dashed #cbd5e1;border-radius:12px;width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:.8em;letter-spacing:.15em}
+.sk-img{background:#eef2f7;border:1px dashed #cbd5e1;border-radius:12px;width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center}
+.sk-img::after{content:attr(data-label);color:#94a3b8;font-size:.8em;letter-spacing:.15em}
 .sk-img.sq{aspect-ratio:1/1}
 .sk-img.wide{aspect-ratio:24/9}
 .sk-hero{background:#f1f5f9;border-radius:16px;padding:3.5em 1.5em;text-align:center;margin-bottom:2.5em}
 .sk-lead{color:#475569;font-size:1.05em}
-.sk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.5em;margin:1.5em 0}
+.sk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5em;margin:1.5em 0}
 .sk-card{border:1px solid #e5e7eb;border-radius:12px;padding:1.25em 1.4em;background:#fff}
 .sk-num{font-size:2.2em;font-weight:800;color:#bfdbfe;line-height:1;margin-bottom:.2em}
 .sk-cta{background:#1d4ed8;color:#fff;border-radius:16px;padding:2.5em 1.5em;text-align:center;margin:2.5em 0}
@@ -30,7 +31,9 @@ const SK = `<style>
 @media(max-width:640px){.sk-media{grid-template-columns:1fr}}
 </style>`
 
-const img = (label = 'IMAGE', cls = ''): string => `<div class="sk-img ${cls}">${label}</div>`
+// 画像プレースホルダ。ラベルは data-label + CSS ::after で表示し、本文テキスト（抜粋）には含めない。
+const img = (label = 'IMAGE', cls = ''): string =>
+  `<div class="sk-img ${cls}" data-label="${label}"></div>`
 
 /** ホーム（フロントページ）本文。home.hbs が末尾にお知らせ一覧を自動付与する。 */
 const HOME = `${SK}
@@ -131,7 +134,7 @@ const ACCESS = `${SK}
   <tr><th>最寄り駅</th><td>サンプル駅 A1出口より徒歩5分</td></tr>
   <tr><th>受付時間</th><td>平日 9:00〜18:00</td></tr>
 </table>
-<div class="sk-img wide" style="margin-top:1.5em">MAP</div>`
+<div class="sk-img wide" style="margin-top:1.5em" data-label="MAP"></div>`
 
 const PRIVACY = `<p>サンプル株式会社（以下「当社」）は、お客様の個人情報を適切に保護することを社会的責務と考え、以下の方針に基づき個人情報の取り扱いを行います。</p>
 <h2>1. 個人情報の取得</h2>
@@ -148,7 +151,7 @@ const PRIVACY = `<p>サンプル株式会社（以下「当社」）は、お客
 
 /** ニュース本文（スケルトン画像＋本文） */
 const newsBody = (lead: string): string =>
-  `${SK}<div class="sk-img" style="margin-bottom:1.5em">IMAGE</div><p>${lead}</p><p>詳細につきましては、本ページまたはお問い合わせ窓口までご確認ください。今後とも当社をよろしくお願いいたします。</p>`
+  `${SK}<div class="sk-img" style="margin-bottom:1.5em" data-label="IMAGE"></div><p>${lead}</p><p>詳細につきましては、本ページまたはお問い合わせ窓口までご確認ください。今後とも当社をよろしくお願いいたします。</p>`
 
 export const demoMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
   /** ダミーのコーポレートサイト一式を挿入する。画像は使わずスケルトンで表現。

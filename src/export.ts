@@ -104,7 +104,7 @@ export class Exporter {
 
     hbs.registerHelper('truncate', (str: string, len: number) => {
       if (!str) return ''
-      const text = str.replace(/<[^>]*>/g, '')
+      const text = stripHtmlTags(str)
       if (text.length <= len) return text
       return text.substring(0, len) + '...'
     })
@@ -1025,10 +1025,14 @@ interface RenderCtx {
 }
 
 function stripHtmlTags(html: string): string {
-  return html
-    .replace(/<[^>]*>/g, '')
-    .replace(/\s+/g, ' ')
-    .trim()
+  return (
+    html
+      // style/script はタグだけ除去すると中身（CSS/JS）が残るのでブロックごと削除
+      .replace(/<(style|script)[^>]*>[\s\S]*?<\/\1>/gi, '')
+      .replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+  )
 }
 
 function wrapHtml(title: string, site: SiteConfig, lang: string, content: string): string {
