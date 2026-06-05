@@ -147,6 +147,18 @@ export const outputMixin: Partial<CmsComponent> & ThisType<CmsComponent> = {
     revokePreviewBlobUrls()
   },
 
+  /** プレビューを別タブ（フル幅）で開く。サイドパネルが狭くデザインを確認しにくいときに使う。
+   *  未生成なら先に showPreview() で生成してから開く。 */
+  async openPreviewInNewTab() {
+    if (!this.previewHtml) await this.showPreview()
+    if (!this.previewHtml) return
+    const blob = new Blob([this.previewHtml], { type: 'text/html' })
+    const url = URL.createObjectURL(blob)
+    window.open(url, '_blank')
+    // 新規タブの読み込み完了後に解放（アセットのプレビューBlobは revoke しない）
+    window.setTimeout(() => URL.revokeObjectURL(url), 60000)
+  },
+
   // --- 書き出し（静的HTML生成 + 差分抽出） ---
 
   async exportSite() {

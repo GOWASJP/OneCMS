@@ -197,6 +197,7 @@ export interface CmsComponent {
   deleteContent(): Promise<void>
   deletePage(): Promise<void>
   showPreview(): Promise<void>
+  openPreviewInNewTab(): Promise<void>
   closePanel(): void
   exportSite(): Promise<void>
   downloadChangedZip(): Promise<void>

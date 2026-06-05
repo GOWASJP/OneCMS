@@ -3033,23 +3033,23 @@
                       <span x-text="t('theme.chooseNote')"></span>
                     </p>
                     <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                      <template x-for="t in installedThemes" :key="t.id">
+                      <template x-for="theme in installedThemes" :key="theme.id">
                         <div
                           class="border rounded-lg p-4 transition"
-                          :class="activeThemeId === t.id ? 'border-[var(--ds-primary-600)] bg-[var(--ds-primary-100)]' : 'border-[var(--ds-border-default)] bg-[var(--ds-bg-surface)]'"
+                          :class="activeThemeId === theme.id ? 'border-[var(--ds-primary-600)] bg-[var(--ds-primary-100)]' : 'border-[var(--ds-border-default)] bg-[var(--ds-bg-surface)]'"
                         >
                           <div class="flex items-center gap-2 mb-1">
                             <i
                               data-lucide="palette"
                               class="w-4 h-4 text-[var(--ds-primary-600)]"
                             ></i>
-                            <span class="font-bold text-sm truncate" x-text="t.name"></span>
+                            <span class="font-bold text-sm truncate" x-text="theme.name"></span>
                           </div>
                           <p
                             class="text-[11px] text-[var(--ds-text-muted)] mb-3"
-                            x-text="((t.version ? 'v' + t.version : '') + (t.author ? ' / ' + t.author : '')) || t('theme.package')"
+                            x-text="((theme.version ? 'v' + theme.version : '') + (theme.author ? ' / ' + theme.author : '')) || t('theme.package')"
                           ></p>
-                          <template x-if="activeThemeId === t.id">
+                          <template x-if="activeThemeId === theme.id">
                             <span
                               class="inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--ds-primary-600)]"
                             >
@@ -3057,8 +3057,11 @@
                               <span x-text="t('theme.inUse')"></span>
                             </span>
                           </template>
-                          <template x-if="activeThemeId !== t.id">
-                            <button @click="switchTheme(t.id)" class="gh-btn-outline text-[12px]">
+                          <template x-if="activeThemeId !== theme.id">
+                            <button
+                              @click="switchTheme(theme.id)"
+                              class="gh-btn-outline text-[12px]"
+                            >
                               <span x-text="t('theme.activate')"></span>
                             </button>
                           </template>
@@ -3953,19 +3956,29 @@
               class="text-sm font-semibold text-[var(--ds-text-heading)]"
               x-text="t('btn.preview')"
             ></span>
-            <button
-              @click.stop="closePanel()"
-              class="w-8 h-8 flex items-center justify-center text-[var(--ds-text-muted)] hover:text-[var(--ds-text-heading)] rounded hover:bg-[var(--ds-bg-hover)]"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+            <div class="flex items-center gap-1">
+              <button
+                @click.stop="openPreviewInNewTab()"
+                class="inline-flex items-center gap-1 h-8 px-2 text-xs text-[var(--ds-text-muted)] hover:text-[var(--ds-text-heading)] rounded hover:bg-[var(--ds-bg-hover)]"
+                :title="t('btn.previewNewTab')"
+              >
+                <i data-lucide="external-link" class="w-4 h-4"></i>
+                <span x-text="t('btn.previewNewTab')"></span>
+              </button>
+              <button
+                @click.stop="closePanel()"
+                class="w-8 h-8 flex items-center justify-center text-[var(--ds-text-muted)] hover:text-[var(--ds-text-heading)] rounded hover:bg-[var(--ds-bg-hover)]"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
           <div class="flex-1 overflow-hidden relative">
             <iframe

@@ -29,6 +29,7 @@ export const DEFAULT_UI_CATALOGS: Record<string, Record<string, string>> = {
     'nav.systemSettings': 'システム設定',
     // トップバー / 共通
     'btn.preview': 'プレビュー',
+    'btn.previewNewTab': '別タブで開く',
     'btn.history': '履歴',
     'btn.save': '保存',
     'btn.delete': '削除',
@@ -452,6 +453,7 @@ export const DEFAULT_UI_CATALOGS: Record<string, Record<string, string>> = {
     'nav.siteInfo': 'Site info',
     'nav.systemSettings': 'System settings',
     'btn.preview': 'Preview',
+    'btn.previewNewTab': 'Open in new tab',
     'btn.history': 'History',
     'btn.save': 'Save',
     'btn.delete': 'Delete',
